@@ -1,4 +1,4 @@
-package no.nav.bidrag.template
+package no.nav.bidrag.samhandler
 
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import org.slf4j.Logger
@@ -13,10 +13,10 @@ val SECURE_LOGGER: Logger = LoggerFactory.getLogger("secureLogger")
 
 @SpringBootApplication(exclude = [SecurityAutoConfiguration::class, ManagementWebSecurityAutoConfiguration::class])
 @EnableJwtTokenValidation(ignore = ["org.springframework", "org.springdoc"])
-class BidragTemplateSpring
+class BidragSamhandlerSpring
 
 fun main(args: Array<String>) {
-    SpringApplication(BidragTemplateSpring::class.java).apply {
+    SpringApplication(BidragSamhandlerSpring::class.java).apply {
         setAdditionalProfiles(if (args.isEmpty()) PROFILE_NAIS else args[0])
     }.run(*args)
 }

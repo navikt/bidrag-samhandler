@@ -1,4 +1,4 @@
-package no.nav.bidrag.template.config
+package no.nav.bidrag.samhandler.config
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
@@ -14,7 +14,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.context.annotation.Import
 
 @EnableAspectJAutoProxy
-@OpenAPIDefinition(info = Info(title = "bidrag-template-spring", version = "v1"), security = [SecurityRequirement(name = "bearer-key")])
+@OpenAPIDefinition(info = Info(title = "bidrag-samhandler", version = "v1"), security = [SecurityRequirement(name = "bearer-key")])
 @SecurityScheme(bearerFormat = "JWT", name = "bearer-key", scheme = "bearer", type = SecuritySchemeType.HTTP)
 @Configuration
 @EnableJwtTokenValidation

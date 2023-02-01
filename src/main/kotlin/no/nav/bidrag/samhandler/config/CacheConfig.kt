@@ -1,4 +1,4 @@
-package no.nav.bidrag.template.config
+package no.nav.bidrag.samhandler.config
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.bidrag.commons.cache.EnableUserCache

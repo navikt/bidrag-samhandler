@@ -1,4 +1,4 @@
-package no.nav.bidrag.template.model
+package no.nav.bidrag.samhandler.model
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpClientErrorException
