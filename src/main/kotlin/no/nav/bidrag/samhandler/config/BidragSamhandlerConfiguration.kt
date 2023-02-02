@@ -9,9 +9,11 @@ import no.nav.bidrag.commons.web.DefaultCorsFilter
 import no.nav.bidrag.commons.web.MdcFilter
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.context.annotation.Import
+import org.springframework.jms.annotation.EnableJms
 
 @EnableAspectJAutoProxy
 @OpenAPIDefinition(info = Info(title = "bidrag-samhandler", version = "v1"), security = [SecurityRequirement(name = "bearer-key")])
@@ -20,4 +22,6 @@ import org.springframework.context.annotation.Import
 @EnableJwtTokenValidation
 @EnableOAuth2Client(cacheEnabled = true)
 @Import(DefaultCorsFilter::class, MdcFilter::class)
-class DefaultConfiguration
+@EnableConfigurationProperties(MQProperties::class)
+@EnableJms
+class BidragSamhandlerConfiguration

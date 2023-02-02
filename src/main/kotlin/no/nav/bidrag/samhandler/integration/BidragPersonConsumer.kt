@@ -1,4 +1,4 @@
-package no.nav.bidrag.samhandler.consumer
+package no.nav.bidrag.samhandler.integration
 
 import no.nav.bidrag.commons.cache.BrukerCacheable
 import no.nav.bidrag.commons.web.client.AbstractRestClient
