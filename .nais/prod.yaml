@@ -4,3 +4,15 @@ ingresses:
 azure:
   person: bidrag-person.prod-fss-pub.nais.io
   person_clientid: prod-fss.bidrag.bidrag-person
+env:
+  MQ_CONN_NAME: mpls02.adeo.no(1414)
+  MQ_CHANNEL: P_BIDRAG_SAMHANDLER
+  MQ_QUEUE_MANAGER: MPLS02
+  MQ_TSS_REQUEST_QUEUE: queue:///QA.P415.AS10_SAMHANDLER_SERVICE?targetClient=1
+azure_access_inbound:
+  - application: bidrag-sak
+    namespace: bidrag
+    cluster: prod-fss
+  - application: bidrag-ui
+    namespace: bidrag
+    cluster: prod-fss

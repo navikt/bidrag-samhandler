@@ -1,8 +1,6 @@
 package no.nav.bidrag.samhandler
 
-import StubUtils
 import com.github.tomakehurst.wiremock.WireMockServer
-import no.nav.bidrag.commons.web.test.HttpHeaderTestRestTemplate
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.extension.ExtendWith
@@ -17,7 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [BidragSamhandlerLocal::class])
-@SpringBootTest(classes = [BidragSamhandlerLocal::class, StubUtils::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = [BidragSamhandlerLocal::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("test")
 @EnableMockOAuth2Server
@@ -28,12 +26,6 @@ class SpringTestRunner {
 
     @Autowired
     private lateinit var applicationContext: ApplicationContext
-
-    @Autowired
-    lateinit var stubUtils: StubUtils
-
-    @Autowired
-    lateinit var httpHeaderTestRestTemplate: HttpHeaderTestRestTemplate
 
     @AfterEach
     fun reset() {
