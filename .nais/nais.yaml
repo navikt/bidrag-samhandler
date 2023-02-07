@@ -14,8 +14,8 @@ spec:
       rules:
       {{#each azure_access_inbound}}
          - application: {{this.application}}
-      namespace: {{this.namespace}}
-      cluster: {{this.cluster}}
+           namespace: {{this.namespace}}
+           cluster: {{this.cluster}}
       {{/each}}
   secureLogs:
     enabled: true
@@ -40,6 +40,8 @@ spec:
     requests:
       cpu: 500m
       memory: 1024Mi
+  envFrom:
+    - secret: bidrag-samhandler-mq-password
   ingresses:
   {{#each ingresses as |url|}}
     - {{url}}

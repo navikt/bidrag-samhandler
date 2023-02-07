@@ -1,18 +1,15 @@
 name: bidrag-samhandler-feature
 ingresses:
   - https://bidrag-samhandler-feature.dev.intern.nav.no
-azure:
-  person: bidrag-person-feature.dev-fss-pub.nais.io
-  person_clientid: dev-fss.bidrag.bidrag-person-feature
 env:
   MQ_CONN_NAME: b27apvl220.preprod.local(1413)
   MQ_CHANNEL: Q1_BIDRAG_SAMHANDLER
-  MQ_QUEUEMANAGER: MQLS02
+  MQ_QUEUE_MANAGER: MQLS02
   MQ_TSS_REQUEST_QUEUE: queue:///QA.Q1_415.AS10_SAMHANDLER_SERVICE?targetClient=1
 azure_access_inbound:
-    - application: bidrag-sak-feature
-      namespace: bidrag
-      cluster: dev-fss
-    - application: bidrag-ui-feature
-      namespace: bidrag
-      cluster: dev-fss
+  - application: bidrag-sak-feature
+    namespace: bidrag
+    cluster: dev-fss
+  - application: bidrag-ui-feature
+    namespace: bidrag
+    cluster: dev-fss
