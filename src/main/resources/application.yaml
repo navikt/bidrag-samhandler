@@ -20,4 +20,20 @@ ibm:
     connName: ${MQ_CONN_NAME}
     user: srvbidrag-samhandler
     password: ${MQ_PASSWORD}
-    application-name: bidrag-samhandler
+    application-name: BIDRAG-SAMHANDLER
+    tssRequestQueue: ${MQ_TSS_REQUEST_QUEUE}
+    use-authentication-m-q-c-s-p: true
+
+mq:
+  queueManager: ${MQ_QUEUE_MANAGER}
+  channel: ${MQ_CHANNEL}
+  host: b27apvl220.preprod.local1413
+  port: 1413
+  user: srvbidrag-samhandler
+  password: ${MQ_PASSWORD}
+  application-name: BIDRAG-SAMHANDLER
+  tssRequestQueue: ${MQ_TSS_REQUEST_QUEUE}
+  backOffInitialInterval: 15000
+  backOffMaxInterval: 300000
+  timeout: 15000
+

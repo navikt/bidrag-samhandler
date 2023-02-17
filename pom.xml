@@ -16,13 +16,13 @@
 		<java.version>17</java.version>
 		<kotlin.version>1.8.0</kotlin.version>
 		<bidrag-commons.version>0.7.42</bidrag-commons.version>
-		<bidrag-domain.version>1.20230123120404_c8f3f00</bidrag-domain.version>
+		<bidrag-domain.version>1.20230217084842_f5279fd</bidrag-domain.version>
 		<logback-encoder.version>7.2</logback-encoder.version>
 		<token-support.version>2.1.9</token-support.version>
 		<springdoc.version>1.6.13</springdoc.version>
 		<springframework-cloud.version>3.1.5</springframework-cloud.version>
 		<token-support.version>2.0.14</token-support.version>
-		<bidrag-commons-test.version>0.2.2</bidrag-commons-test.version>
+		<bidrag-commons-test.version>1.20230217164307_1ec9d3f</bidrag-commons-test.version>
 		<kotest.version>5.5.4</kotest.version>
 		<mockk.version>4.0.0</mockk.version>
 		<kotlin-logging-jvm.version>3.0.2</kotlin-logging-jvm.version>
@@ -48,10 +48,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-rest</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
@@ -61,10 +57,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web-services</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.session</groupId>
@@ -120,12 +112,47 @@
 			<artifactId>bidrag-commons</artifactId>
 			<version>${bidrag-commons.version}</version>
 		</dependency>
-
 		<dependency >
 			<groupId>no.nav.bidrag</groupId>
 			<artifactId>bidrag-domain</artifactId>
 			<version>${bidrag-domain.version}</version>
 		</dependency>
+
+		<!--XML handling dependencies-->
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+			<version>2.3.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.25.0-GA</version>
+		</dependency>
+
+		<!--MQ dependencies-->
+		<dependency>
+			<groupId>com.ibm.mq</groupId>
+			<artifactId>mq-jms-spring-boot-starter</artifactId>
+			<version>2.7.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+
 		<!--Diverse-->
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
@@ -224,6 +251,52 @@
 		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
 		<plugins>
 			<plugin>
+				<!-- Plugin required to build java classes from XSD using XJC -->
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.14.0</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.glassfish.jaxb</groupId>
+						<artifactId>jaxb-runtime</artifactId>
+						<version>2.3.6</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<markGenerated>true</markGenerated>
+					<enableIntrospection>true</enableIntrospection>
+					<plugins>
+						<plugin>
+							<groupId>org.jvnet.jaxb2_commons</groupId>
+							<artifactId>jaxb2-basics</artifactId>
+							<version>1.11.1</version>
+						</plugin>
+						<plugin>
+							<groupId>org.jvnet.jaxb2_commons</groupId>
+							<artifactId>jaxb2-basics-annotate</artifactId>
+							<version>1.1.0</version>
+						</plugin>
+					</plugins>
+				</configuration>
+				<executions>
+					<execution>
+						<id>kravgrunnlag</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<schemaDirectory>${basedir}/src/main/resources/xsd/</schemaDirectory>
+							<schemaIncludes>
+								<include>**/*.xsd</include>
+							</schemaIncludes>
+							<generateDirectory>${project.build.directory}/generated-sources</generateDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>${project.parent.version}</version>
@@ -254,23 +327,12 @@
 					</args>
 					<compilerPlugins>
 						<plugin>spring</plugin>
-						<plugin>jpa</plugin>
 					</compilerPlugins>
 				</configuration>
 				<dependencies>
 					<dependency>
 						<groupId>org.jetbrains.kotlin</groupId>
 						<artifactId>kotlin-maven-allopen</artifactId>
-						<version>${kotlin.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>org.jetbrains.kotlin</groupId>
-						<artifactId>kotlin-maven-noarg</artifactId>
-						<version>${kotlin.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>org.jetbrains.kotlin</groupId>
-						<artifactId>kotlin-maven-noarg</artifactId>
 						<version>${kotlin.version}</version>
 					</dependency>
 				</dependencies>
