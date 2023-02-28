@@ -21,7 +21,7 @@ class TssService(
     private val mqProperties: MQProperties
 ) {
 
-    @Cacheable("Samhandler")
+//    @Cacheable("Samhandler")
     fun hentSamhandler(ident: Ident): SamhandlerDto? {
         val request = createTssSamhandlerRequest(ident)
         val response: TssSamhandlerData =
