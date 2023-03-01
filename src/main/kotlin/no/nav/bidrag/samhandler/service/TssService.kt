@@ -1,15 +1,15 @@
 package no.nav.bidrag.samhandler.service
 
 import no.nav.bidrag.samhandler.config.MQProperties
-import no.nav.bidrag.samhandler.controller.dto.SamhandlerDto
-import no.nav.bidrag.samhandler.controller.dto.SamhandlersøkeresultatDto
-import no.nav.bidrag.samhandler.controller.dto.SøkSamhandlerQuery
 import no.nav.bidrag.samhandler.exception.SamhandlerNotFoundException
 import no.nav.bidrag.samhandler.exception.TSSServiceException
 import no.nav.bidrag.samhandler.integration.MqClient
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.mapper.TssRequestMapper.createSamhandlersøkRequest
 import no.nav.bidrag.samhandler.mapper.TssRequestMapper.createTssSamhandlerRequest
+import no.nav.bidrag.transport.samhandler.SamhandlerDto
+import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
+import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import no.nav.domain.ident.Ident
 import no.rtv.namespacetss.TssSamhandlerData
 import org.springframework.cache.annotation.Cacheable

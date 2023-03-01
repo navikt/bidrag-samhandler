@@ -2,10 +2,10 @@ package no.nav.bidrag.samhandler.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import no.nav.bidrag.samhandler.controller.dto.SamhandlerDto
-import no.nav.bidrag.samhandler.controller.dto.SamhandlersøkeresultatDto
-import no.nav.bidrag.samhandler.controller.dto.SøkSamhandlerQuery
 import no.nav.bidrag.samhandler.service.TssService
+import no.nav.bidrag.transport.samhandler.SamhandlerDto
+import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
+import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import no.nav.domain.ident.Ident
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.web.bind.annotation.GetMapping

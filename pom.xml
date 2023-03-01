@@ -112,6 +112,11 @@
 			<artifactId>bidrag-commons</artifactId>
 			<version>${bidrag-commons.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>no.nav.bidrag</groupId>
+			<artifactId>bidrag-transport</artifactId>
+			<version>20230301132027_32a239c</version>
+		</dependency>
 		<dependency >
 			<groupId>no.nav.bidrag</groupId>
 			<artifactId>bidrag-domain</artifactId>

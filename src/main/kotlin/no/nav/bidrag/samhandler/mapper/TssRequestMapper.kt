@@ -1,7 +1,7 @@
 package no.nav.bidrag.samhandler.mapper
 
-import no.nav.bidrag.samhandler.controller.dto.SøkSamhandlerQuery
 import no.nav.bidrag.samhandler.service.TssService
+import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import no.nav.domain.ident.Ident
 import no.nav.domain.ident.Identtype
 import no.rtv.namespacetss.SamhandlerIDataB910Type

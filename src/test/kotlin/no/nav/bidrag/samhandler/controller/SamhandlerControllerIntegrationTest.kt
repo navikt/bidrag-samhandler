@@ -2,10 +2,11 @@ package no.nav.bidrag.samhandler.controller
 
 import io.kotest.matchers.shouldBe
 import no.nav.bidrag.samhandler.SpringTestRunner
-import no.nav.bidrag.samhandler.controller.dto.AdresseDto
-import no.nav.bidrag.samhandler.controller.dto.KontonummerDto
-import no.nav.bidrag.samhandler.controller.dto.SamhandlerDto
-import no.nav.bidrag.samhandler.controller.dto.SamhandlersøkeresultatDto
+import no.nav.bidrag.transport.samhandler.AdresseDto
+import no.nav.bidrag.transport.samhandler.KontonummerDto
+import no.nav.bidrag.transport.samhandler.SamhandlerDto
+import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
+import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import no.nav.domain.ident.Ident
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
@@ -15,16 +16,14 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
     fun urlForPost() = rootUriComponentsBuilder().pathSegment("samhandler").build().toUri()
 
     fun urlForGet() = rootUriComponentsBuilder().pathSegment("samhandler")
-        .queryParam("navn", "navn")
-        .queryParam("postnummer", "postnummer")
-        .queryParam("område", "område")
+        .queryParams(SøkSamhandlerQuery("navn", "postnummer", "område").toQueryParams())
         .build().toUri()
 
     @Test
     fun `post for Ident retunerer korrekt bygd SamhandlerDto`() {
         val forventetResultat = SamhandlerDto(
             tssId = "idOffTSS",
-            samhandlernavn = "navnSamh",
+            navn = "navnSamh",
             offentligId = "idOff",
             offentligIdType = "kodeIdentType",
             adresse = AdresseDto(
@@ -59,7 +58,7 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
             listOf(
                 SamhandlerDto(
                     tssId = "idOffTSS",
-                    samhandlernavn = "navnSamh",
+                    navn = "navnSamh",
                     offentligId = "idOff",
                     offentligIdType = "kodeIdentType",
                     adresse = AdresseDto(

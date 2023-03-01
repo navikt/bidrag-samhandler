@@ -1,8 +1,8 @@
 package no.nav.bidrag.samhandler.mapper
 
-import no.nav.bidrag.samhandler.controller.dto.AdresseDto
-import no.nav.bidrag.samhandler.controller.dto.KontonummerDto
-import no.nav.bidrag.samhandler.controller.dto.SamhandlerDto
+import no.nav.bidrag.transport.samhandler.AdresseDto
+import no.nav.bidrag.transport.samhandler.KontonummerDto
+import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.rtv.namespacetss.Samhandler
 import no.rtv.namespacetss.TssSamhandlerData
 import no.rtv.namespacetss.TypeKomp940
@@ -20,7 +20,7 @@ object SamhandlerMapper {
             val samhandlerType = gyldigSamhandler(it.samhandler110)
             SamhandlerDto(
                 tssId = mapTilTssEksternId(it.samhandlerAvd125),
-                samhandlernavn = samhandlerType?.navnSamh,
+                navn = samhandlerType?.navnSamh,
                 offentligId = samhandlerType?.idOff,
                 offentligIdType = samhandlerType?.kodeIdentType,
                 adresse = mapTilAdresse(it.adresse130),
@@ -38,7 +38,7 @@ object SamhandlerMapper {
         val samhandlerType = gyldigSamhandler(enkeltSamhandler.samhandler110)
         return SamhandlerDto(
             tssId = mapTilTssEksternId(enkeltSamhandler.samhandlerAvd125),
-            samhandlernavn = samhandlerType?.navnSamh,
+            navn = samhandlerType?.navnSamh,
             offentligId = samhandlerType?.idOff,
             offentligIdType = samhandlerType?.kodeIdentType,
             adresse = mapTilAdresse(enkeltSamhandler.adresse130)

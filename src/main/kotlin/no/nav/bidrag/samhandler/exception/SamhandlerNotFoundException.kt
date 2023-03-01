@@ -1,3 +1,6 @@
 package no.nav.bidrag.samhandler.exception
 
-class SamhandlerNotFoundException(message: String?, error: Throwable? = null) : Exception(message, error)
+import org.springframework.http.HttpStatus
+import org.springframework.web.client.HttpStatusCodeException
+
+class SamhandlerNotFoundException(message: String) : HttpStatusCodeException(HttpStatus.NOT_FOUND, message)
