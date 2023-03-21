@@ -14,3 +14,6 @@ azure_access_inbound:
   - application: bidrag-ui-feature
     namespace: bidrag
     cluster: dev-fss
+  - application: bidrag-aktoerregister-feature
+    namespace: bidrag
+    cluser: dev-gcp

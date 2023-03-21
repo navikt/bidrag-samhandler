@@ -1,5 +1,6 @@
 package no.nav.bidrag.samhandler.mapper
 
+import no.nav.bidrag.commons.util.trimToNull
 import no.nav.bidrag.transport.samhandler.AdresseDto
 import no.nav.bidrag.transport.samhandler.KontonummerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
@@ -20,9 +21,9 @@ object SamhandlerMapper {
             val samhandlerType = gyldigSamhandler(it.samhandler110)
             SamhandlerDto(
                 tssId = mapTilTssEksternId(it.samhandlerAvd125),
-                navn = samhandlerType?.navnSamh,
-                offentligId = samhandlerType?.idOff,
-                offentligIdType = samhandlerType?.kodeIdentType,
+                navn = samhandlerType?.navnSamh.trimToNull(),
+                offentligId = samhandlerType?.idOff.trimToNull(),
+                offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
                 adresse = mapTilAdresse(it.adresse130),
                 kontonummer = mapToKontonummer(it)
             )
@@ -38,9 +39,9 @@ object SamhandlerMapper {
         val samhandlerType = gyldigSamhandler(enkeltSamhandler.samhandler110)
         return SamhandlerDto(
             tssId = mapTilTssEksternId(enkeltSamhandler.samhandlerAvd125),
-            navn = samhandlerType?.navnSamh,
-            offentligId = samhandlerType?.idOff,
-            offentligIdType = samhandlerType?.kodeIdentType,
+            navn = samhandlerType?.navnSamh.trimToNull(),
+            offentligId = samhandlerType?.idOff.trimToNull(),
+            offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
             adresse = mapTilAdresse(enkeltSamhandler.adresse130)
         )
     }
@@ -54,12 +55,12 @@ object SamhandlerMapper {
     private fun mapTilAdresse(adresse130: TypeSamhAdr?) =
         adresse130?.adresseSamh?.firstOrNull()?.let {
             AdresseDto(
-                land = it.kodeLand.trim(),
-                poststed = it.poststed.trim(),
-                postnr = it.postNr.trim(),
-                adresselinje1 = it.adrLinjeInfo?.adresseLinje?.firstOrNull()?.trim(),
-                adresselinje2 = it.adrLinjeInfo?.adresseLinje?.getOrNull(1)?.trim(),
-                adresselinje3 = it.adrLinjeInfo?.adresseLinje?.getOrNull(2)?.trim()
+                land = it.kodeLand?.trimToNull(),
+                poststed = it.poststed?.trimToNull(),
+                postnr = it.postNr?.trimToNull(),
+                adresselinje1 = it.adrLinjeInfo?.adresseLinje?.firstOrNull()?.trimToNull(),
+                adresselinje2 = it.adrLinjeInfo?.adresseLinje?.getOrNull(1)?.trimToNull(),
+                adresselinje3 = it.adrLinjeInfo?.adresseLinje?.getOrNull(2)?.trimToNull()
             )
         }
 
@@ -69,13 +70,13 @@ object SamhandlerMapper {
 
         return (kontoTypeInnland ?: kontoTypeUtland)?.let {
             KontonummerDto(
-                landkodeBank = it.kodeLand,
-                banknavn = it.bankNavn,
-                norskKontonummer = it.gironrInnland,
-                swift = it.swiftKode,
-                valutakode = it.kodeValuta,
-                bankCode = it.bankKode,
-                iban = it.gironrUtland
+                landkodeBank = it.kodeLand?.trimToNull(),
+                banknavn = it.bankNavn?.trimToNull(),
+                norskKontonummer = it.gironrInnland?.trimToNull(),
+                swift = it.swiftKode?.trimToNull(),
+                valutakode = it.kodeValuta?.trimToNull(),
+                bankCode = it.bankKode?.trimToNull(),
+                iban = it.gironrUtland?.trimToNull()
             )
         }
     }

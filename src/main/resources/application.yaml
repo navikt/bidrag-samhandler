@@ -6,6 +6,8 @@ management:
 
 springdoc:
   packages-to-scan: no.nav.bidrag.samhandler.controller
+  swagger-ui:
+    path: /
 spring.main.banner-mode: off
 
 no.nav.security.jwt:
