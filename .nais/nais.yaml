@@ -13,7 +13,7 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: {{env.MQ_HOSTNAME}}
+        - host: {{env.MQ_HOST}}
           ports:
             - name: MQ
               port: {{env.MQ_PORT}}
