@@ -13,7 +13,11 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: {{ mq-hostname }}
+        - host: {{env.MQ_HOSTNAME}}
+          ports:
+            - name: MQ
+              port: {{env.MQ_PORT}}
+              protocol: TCP
     inbound:
       rules:
       {{#each azure_access_inbound}}
