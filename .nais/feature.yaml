@@ -3,6 +3,8 @@ ingresses:
   - https://bidrag-samhandler-feature.dev.intern.nav.no
 env:
   MQ_CONN_NAME: b27apvl220.preprod.local(1413)
+  MQ_HOST: b27apvl220.preprod.local
+  MQ_PORT: 1413
   MQ_CHANNEL: Q1_BIDRAG_SAMHANDLER
   MQ_QUEUE_MANAGER: MQLS02
   MQ_TSS_REQUEST_QUEUE: queue:///QA.Q1_415.AS10_SAMHANDLER_SERVICE?targetClient=1

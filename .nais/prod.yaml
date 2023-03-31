@@ -3,6 +3,8 @@ ingresses:
   - https://bidrag-samhandler.intern.nav.no
 env:
   MQ_CONN_NAME: mpls02.adeo.no(1414)
+  MQ_HOST: mpls02.adeo.no
+  MQ_PORT: 1414
   MQ_CHANNEL: P_BIDRAG_SAMHANDLER
   MQ_QUEUE_MANAGER: MPLS02
   MQ_TSS_REQUEST_QUEUE: queue:///QA.P415.AS10_SAMHANDLER_SERVICE?targetClient=1

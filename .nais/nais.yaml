@@ -11,6 +11,13 @@ spec:
       enabled: true
       allowAllUsers: true
   accessPolicy:
+    outbound:
+      external:
+        - host: {{env.MQ_HOST}}
+          ports:
+            - name: MQ
+              port: {{env.MQ_PORT}}
+              protocol: TCP
     inbound:
       rules:
       {{#each azure_access_inbound}}
