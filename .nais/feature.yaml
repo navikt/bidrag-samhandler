@@ -7,6 +7,9 @@ env:
   MQ_QUEUE_MANAGER: MQLS02
   MQ_TSS_REQUEST_QUEUE: queue:///QA.Q1_415.AS10_SAMHANDLER_SERVICE?targetClient=1
   JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+access:
+  outbound:
+    mq-hostname: b27apvl220.preprod.local
 azure_access_inbound:
   - application: bidrag-sak-feature
     namespace: bidrag

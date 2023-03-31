@@ -6,6 +6,9 @@ env:
   MQ_CHANNEL: P_BIDRAG_SAMHANDLER
   MQ_QUEUE_MANAGER: MPLS02
   MQ_TSS_REQUEST_QUEUE: queue:///QA.P415.AS10_SAMHANDLER_SERVICE?targetClient=1
+access:
+  outbound:
+    mq-hostname: mpls02.adeo.no
 azure_access_inbound:
   - application: bidrag-sak
     namespace: bidrag

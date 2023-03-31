@@ -11,6 +11,9 @@ spec:
       enabled: true
       allowAllUsers: true
   accessPolicy:
+    outbound:
+      external:
+        - host: {{ mq-hostname }}
     inbound:
       rules:
       {{#each azure_access_inbound}}
