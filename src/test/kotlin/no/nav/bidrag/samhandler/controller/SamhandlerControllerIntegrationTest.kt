@@ -1,13 +1,13 @@
 package no.nav.bidrag.samhandler.controller
 
 import io.kotest.matchers.shouldBe
+import no.nav.bidrag.domain.ident.Ident
 import no.nav.bidrag.samhandler.SpringTestRunner
 import no.nav.bidrag.transport.samhandler.AdresseDto
 import no.nav.bidrag.transport.samhandler.KontonummerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
-import no.nav.domain.ident.Ident
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 
@@ -45,8 +45,7 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
             )
         )
 
-        val responseEntity =
-            httpHeaderTestRestTemplate.postForEntity<SamhandlerDto>(urlForPost(), Ident("80000000003"))
+        val responseEntity = httpHeaderTestRestTemplate.postForEntity<SamhandlerDto>(urlForPost(), Ident("80000000003"))
 
         responseEntity.statusCode shouldBe HttpStatus.OK
         responseEntity.body shouldBe forventetResultat
