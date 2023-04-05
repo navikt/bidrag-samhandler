@@ -1,5 +1,6 @@
 package no.nav.bidrag.samhandler.service
 
+import no.nav.bidrag.domain.ident.Ident
 import no.nav.bidrag.samhandler.config.MQProperties
 import no.nav.bidrag.samhandler.exception.SamhandlerNotFoundException
 import no.nav.bidrag.samhandler.exception.TSSServiceException
@@ -10,7 +11,6 @@ import no.nav.bidrag.samhandler.mapper.TssRequestMapper.createTssSamhandlerReque
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
-import no.nav.domain.ident.Ident
 import no.rtv.namespacetss.TssSamhandlerData
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
