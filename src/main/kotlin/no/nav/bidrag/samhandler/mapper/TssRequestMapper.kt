@@ -32,10 +32,10 @@ object TssRequestMapper {
     private fun getSamhandlerIDataB940Data(søkSamhandlerQuery: SøkSamhandlerQuery): SamhandlerIDataB940Type {
         return SamhandlerIDataB940Type().apply {
             brukerID = TssService.BRUKER_ID
-            navnSamh = søkSamhandlerQuery.navn
+            navnSamh = søkSamhandlerQuery.navn.verdi
             kodeSamhType = "KRED"
-            postNr = søkSamhandlerQuery.postnummer
-            omrade = søkSamhandlerQuery.område
+            postNr = søkSamhandlerQuery.postnummer?.verdi
+            omrade = søkSamhandlerQuery.område?.verdi
             buffnr = søkSamhandlerQuery.side.toString().padStart(3, '0')
         }
     }
