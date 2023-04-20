@@ -16,8 +16,7 @@
 		<java.version>17</java.version>
 		<kotlin.version>1.8.0</kotlin.version>
 		<bidrag-commons.version>0.7.50</bidrag-commons.version>
-		<bidrag-domain.version>20230328141843_80a5002</bidrag-domain.version>
-		<bidrag-transport.version>20230328144249_53d8cd4</bidrag-transport.version>
+		<bidrag-transport.version>20230420100825_db5a095</bidrag-transport.version>
 		<logback-encoder.version>7.2</logback-encoder.version>
 		<token-support.version>2.1.9</token-support.version>
 		<springdoc.version>1.6.13</springdoc.version>
@@ -117,11 +116,6 @@
 			<groupId>no.nav.bidrag</groupId>
 			<artifactId>bidrag-transport</artifactId>
 			<version>${bidrag-transport.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>no.nav.bidrag</groupId>
-			<artifactId>bidrag-domain</artifactId>
-			<version>${bidrag-domain.version}</version>
 		</dependency>
 
 		<!--XML handling dependencies-->

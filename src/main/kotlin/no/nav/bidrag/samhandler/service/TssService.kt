@@ -1,5 +1,6 @@
 package no.nav.bidrag.samhandler.service
 
+import no.nav.bidrag.domain.bool.FlereForekomster
 import no.nav.bidrag.domain.ident.Ident
 import no.nav.bidrag.samhandler.config.MQProperties
 import no.nav.bidrag.samhandler.exception.SamhandlerNotFoundException
@@ -51,20 +52,20 @@ class TssService(
         }
     }
 
-    private fun validateSøkResponse(tssSamhandlerData: TssSamhandlerData, verdi: Any): Boolean {
+    private fun validateSøkResponse(tssSamhandlerData: TssSamhandlerData, verdi: Any): FlereForekomster {
         val svarstatus = tssSamhandlerData.tssOutputData.svarStatus
         if (svarstatus.alvorligGrad != TSS_STATUS_OK) {
             if (svarstatus.kodeMelding == KODEMELDING_INGEN_FUNNET) {
                 throw SamhandlerNotFoundException("Ingen treff med med inputData=$verdi")
             }
-            if (svarstatus.kodeMelding == KODEMELDING_MER_INFO) return true
-            if (svarstatus.kodeMelding == KODEMELDING_INGEN_FLERE_FOREKOMSTER) return false
+            if (svarstatus.kodeMelding == KODEMELDING_MER_INFO) return FlereForekomster(true)
+            if (svarstatus.kodeMelding == KODEMELDING_INGEN_FLERE_FOREKOMSTER) return FlereForekomster(false)
             throw TSSServiceException("${svarstatus.beskrMelding} - ${svarstatus.alvorligGrad} - ${svarstatus.kodeMelding}")
         }
         if (tssSamhandlerData.tssOutputData.ingenReturData != null) {
             throw SamhandlerNotFoundException("Ingen returdata for TSS request med inputData=$verdi")
         }
-        return false
+        return FlereForekomster(false)
     }
 
     companion object {
