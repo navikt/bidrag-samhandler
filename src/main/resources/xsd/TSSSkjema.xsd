@@ -2,9 +2,9 @@
 <!-- edited with XMLSpy v2010 rel. 3 sp1 (x64) (http://www.altova.com) by XMLSpy 2009 Enterprise Ed., Installed for 30 users (with SMP from 2009-06-19 to 2010-06-20) (NAV ØKONOMITJENESTER) -->
 <!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com) by Trygdeetaten (Rikstrygdeverket) -->
 <!-- 06.06.2011: lagt inn informasjon om rekvisisjon - informasjonselement 175 -->
-<xs:schema xmlns="http://www.rtv.no/NamespaceTSS"
+<xs:schema xmlns="https://www.rtv.no/NamespaceTSS"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://www.rtv.no/NamespaceTSS"
+  targetNamespace="https://www.rtv.no/NamespaceTSS"
   elementFormDefault="qualified"
   attributeFormDefault="unqualified">
   <xs:element name="tssSamhandlerData">
