@@ -1,8 +1,9 @@
 package no.nav.bidrag.samhandler.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
+import org.springframework.boot.context.properties.bind.ConstructorBinding
 
 @ConfigurationProperties(prefix = "ibm.mq")
+class MQProperties
 @ConstructorBinding
-class MQProperties(val tssRequestQueue: String)
+constructor(val tssRequestQueue: String)

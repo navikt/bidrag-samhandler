@@ -27,6 +27,7 @@ import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import org.junit.jupiter.api.Test
+import org.springframework.boot.test.web.client.getForEntity
 import org.springframework.http.HttpStatus
 
 class SamhandlerControllerIntegrationTest : SpringTestRunner() {
@@ -92,9 +93,8 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
             ),
             flereForekomster = FlereForekomster(false)
         )
-
         val responseEntity =
-            httpHeaderTestRestTemplate.getForEntity<SamhandlersøkeresultatDto>(urlForGet(), null)
+            httpHeaderTestRestTemplate.getForEntity<SamhandlersøkeresultatDto>(urlForGet().toString(), null)
 
         responseEntity.statusCode shouldBe HttpStatus.OK
         responseEntity.body shouldBe forventetSøkeresultat

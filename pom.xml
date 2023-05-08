@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.8</version>
+		<version>3.0.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>no.nav</groupId>
@@ -14,18 +14,21 @@
 	<name>bidrag-samhandler</name>
 	<properties>
 		<java.version>17</java.version>
-		<kotlin.version>1.8.0</kotlin.version>
-		<bidrag-commons.version>0.7.50</bidrag-commons.version>
-		<bidrag-transport.version>20230420100825_db5a095</bidrag-transport.version>
-		<logback-encoder.version>7.2</logback-encoder.version>
+		<kotlin.version>1.8.21</kotlin.version>
+		<bidrag-commons.version>20230427084654_4121ef0</bidrag-commons.version>
+		<bidrag-transport.version>20230508100903_0aa6729</bidrag-transport.version>
+		<logback-encoder.version>7.3</logback-encoder.version>
 		<token-support.version>2.1.9</token-support.version>
-		<springdoc.version>1.6.13</springdoc.version>
-		<springframework-cloud.version>3.1.5</springframework-cloud.version>
-		<token-support.version>2.0.14</token-support.version>
-		<bidrag-commons-test.version>1.20230217164307_1ec9d3f</bidrag-commons-test.version>
-		<kotest.version>5.5.4</kotest.version>
-		<mockk.version>4.0.0</mockk.version>
-		<kotlin-logging-jvm.version>3.0.2</kotlin-logging-jvm.version>
+		<springdoc-openapi-ui.version>2.1.0</springdoc-openapi-ui.version>
+		<springframework-cloud.version>4.0.2</springframework-cloud.version>
+		<token-support.version>3.0.10</token-support.version>
+		<bidrag-commons-test.version>1.20230504132526_a72fa41</bidrag-commons-test.version>
+		<kotest.version>5.6.1</kotest.version>
+		<jakarta.xml.ws-api.version>4.0.0</jakarta.xml.ws-api.version>
+		<jaxws.version>4.0.0</jaxws.version>
+		<jaxws-maven-plugin.version>3.0.0</jaxws-maven-plugin.version>
+		<mockk.version>4.0.2</mockk.version>
+		<kotlin-logging-jvm.version>3.0.5</kotlin-logging-jvm.version>
 	</properties>
 
 	<repositories>
@@ -34,6 +37,22 @@
 			<url>https://maven.pkg.github.com/navikt/bidrag-commons</url>
 		</repository>
 	</repositories>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.yaml</groupId>
+				<artifactId>snakeyaml</artifactId>
+				<version>2.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.woodstox</groupId>
+				<artifactId>woodstox-core</artifactId>
+				<version>6.4.0</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 
@@ -76,35 +95,30 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-oxm</artifactId>
+<!--			<version>6.0.8</version>-->
+		</dependency>
 
-		<!--SpringDoc-->
+		<!-- swagger -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-kotlin</artifactId>
-			<version>${springdoc.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>${springdoc.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-data-rest</artifactId>
-			<version>${springdoc.version}</version>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${springdoc-openapi-ui.version}</version>
 		</dependency>
 
 		<!--Sikkerhet-->
-		<dependency>
-			<groupId>no.nav.security</groupId>
-			<artifactId>token-validation-spring</artifactId>
-			<version>${token-support.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>no.nav.security</groupId>
-			<artifactId>token-client-spring</artifactId>
-			<version>${token-support.version}</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>no.nav.security</groupId>-->
+<!--			<artifactId>token-validation-spring</artifactId>-->
+<!--			<version>${token-support.version}</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>no.nav.security</groupId>-->
+<!--			<artifactId>token-client-spring</artifactId>-->
+<!--			<version>${token-support.version}</version>-->
+<!--		</dependency>-->
 
 		<!--NAV-->
 		<dependency>
@@ -119,32 +133,30 @@
 		</dependency>
 
 		<!--XML handling dependencies-->
+		<!--XML-->
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-			<version>2.3.0.1</version>
+			<groupId>jakarta.xml.ws</groupId>
+			<artifactId>jakarta.xml.ws-api</artifactId>
+			<version>${jakarta.xml.ws-api.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.3.1</version>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-rt</artifactId>
+			<version>${jaxws.version}</version>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.3.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.25.0-GA</version>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-ri</artifactId>
+			<version>${jaxws.version}</version>
+			<type>pom</type>
 		</dependency>
 
 		<!--MQ dependencies-->
 		<dependency>
 			<groupId>com.ibm.mq</groupId>
 			<artifactId>mq-jms-spring-boot-starter</artifactId>
-			<version>2.7.8</version>
+			<version>3.0.6</version>
 		</dependency>
 
 		<dependency>
@@ -162,10 +174,6 @@
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
 			<artifactId>kotlin-reflect</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.github.ben-manes.caffeine</groupId>
@@ -231,6 +239,16 @@
 			<artifactId>spring-cloud-starter-contract-stub-runner</artifactId>
 			<version>${springframework-cloud.version}</version>
 			<scope>test</scope>
+			<exclusions>
+			<exclusion>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+			</exclusion>
+			<exclusion>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+			</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>no.nav.security</groupId>
@@ -251,45 +269,29 @@
 		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
 		<plugins>
 			<plugin>
-				<!-- Plugin required to build java classes from XSD using XJC -->
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.14.0</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.glassfish.jaxb</groupId>
-						<artifactId>jaxb-runtime</artifactId>
-						<version>2.3.6</version>
-					</dependency>
-				</dependencies>
+				<groupId>com.sun.xml.ws</groupId>
+				<artifactId>jaxws-maven-plugin</artifactId>
+				<version>${jaxws-maven-plugin.version}</version>
 				<configuration>
-					<markGenerated>true</markGenerated>
-					<enableIntrospection>true</enableIntrospection>
-					<plugins>
-						<plugin>
-							<groupId>org.jvnet.jaxb2_commons</groupId>
-							<artifactId>jaxb2-basics</artifactId>
-							<version>1.11.1</version>
-						</plugin>
-						<plugin>
-							<groupId>org.jvnet.jaxb2_commons</groupId>
-							<artifactId>jaxb2-basics-annotate</artifactId>
-							<version>1.1.0</version>
-						</plugin>
-					</plugins>
+					<wsdlDirectory>${basedir}/src/main/resources</wsdlDirectory>
+					<sourceDestDir>${project.build.directory}/generated-sources/tss</sourceDestDir>
+					<extension>true</extension>
 				</configuration>
 				<executions>
 					<execution>
-						<id>kravgrunnlag</id>
+						<id>USER_INFO</id>
+						<phase>generate-sources</phase>
 						<goals>
-							<goal>generate</goal>
+							<goal>wsimport</goal>
 						</goals>
 						<configuration>
-							<schemaDirectory>${basedir}/src/main/resources/xsd/</schemaDirectory>
-							<schemaIncludes>
-								<include>**/*.xsd</include>
-							</schemaIncludes>
-							<generateDirectory>${project.build.directory}/generated-sources</generateDirectory>
+							<wsdlFiles>
+								<wsdlFile>xsd/TSS.wsdl</wsdlFile>
+							</wsdlFiles>
+							<args>
+								<arg>-B-XautoNameResolution</arg>
+							</args>
+							<packageName>no.rtv.namespacetss</packageName>
 						</configuration>
 					</execution>
 				</executions>
@@ -322,6 +324,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<jvmTarget>17</jvmTarget>
 					<args>
 						<arg>-Xjsr305=strict</arg>
 					</args>
