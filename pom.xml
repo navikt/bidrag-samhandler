@@ -17,7 +17,7 @@
 		<kotlin.version>1.8.21</kotlin.version>
 		<bidrag-commons.version>20230427084654_4121ef0</bidrag-commons.version>
 		<bidrag-transport.version>20230830130904_1d8ade2</bidrag-transport.version>
-		<logback-encoder.version>7.3</logback-encoder.version>
+		<logback-encoder.version>7.4</logback-encoder.version>
 		<token-support.version>2.1.9</token-support.version>
 		<springdoc-openapi-ui.version>2.1.0</springdoc-openapi-ui.version>
 		<springframework-cloud.version>4.0.2</springframework-cloud.version>
