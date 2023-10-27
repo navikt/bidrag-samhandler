@@ -25,7 +25,7 @@
 		<bidrag-commons-test.version>1.20230504132526_a72fa41</bidrag-commons-test.version>
 		<kotest.version>5.6.1</kotest.version>
 		<jakarta.xml.ws-api.version>4.0.0</jakarta.xml.ws-api.version>
-		<jaxws.version>4.0.0</jaxws.version>
+		<jaxws.version>4.0.2</jaxws.version>
 		<jaxws-maven-plugin.version>3.0.0</jaxws-maven-plugin.version>
 		<mockk.version>4.0.2</mockk.version>
 		<kotlin-logging-jvm.version>3.0.5</kotlin-logging-jvm.version>
