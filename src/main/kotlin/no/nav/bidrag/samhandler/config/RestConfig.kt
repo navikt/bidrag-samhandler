@@ -10,7 +10,6 @@ import java.time.format.DateTimeFormatter
 
 @Configuration
 class RestConfig {
-
     @Bean
     fun jackson2ObjectMapperBuilderCustomizer(): Jackson2ObjectMapperBuilderCustomizer =
         Jackson2ObjectMapperBuilderCustomizer {
@@ -20,8 +19,8 @@ class RestConfig {
                 JavaTimeModule()
                     .addDeserializer(
                         YearMonth::class.java,
-                        YearMonthDeserializer(DateTimeFormatter.ofPattern("u-MM")) // Denne trengs for å parse år over 9999 riktig.
-                    )
+                        YearMonthDeserializer(DateTimeFormatter.ofPattern("u-MM")),
+                    ),
             )
         }
 }

@@ -12,7 +12,6 @@ import org.springframework.web.client.HttpStatusCodeException
 
 @RestControllerAdvice
 class DefaultRestControllerAdvice {
-
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     @ResponseBody

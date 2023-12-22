@@ -11,7 +11,6 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller
 @Configuration
 @EnableJms
 class JMSConfiguration {
-
     @Bean
     fun jaxb2Marshaller() = Jaxb2Marshaller().apply { setPackagesToScan("no.rtv") }
 

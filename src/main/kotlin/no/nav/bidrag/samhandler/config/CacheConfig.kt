@@ -24,7 +24,7 @@ class CacheConfig {
         return CaffeineCacheManager().apply {
             registerCustomCache(
                 SAMHANDLER_CACHE,
-                Caffeine.newBuilder().expireAfter(InvaliderCacheFørStartenAvArbeidsdag()).build()
+                Caffeine.newBuilder().expireAfter(InvaliderCacheFørStartenAvArbeidsdag()).build(),
             )
         }
     }

@@ -24,76 +24,88 @@ import org.springframework.stereotype.Component
 @Component
 @Primary
 class MqClientMock : MqClient(mockk(relaxed = true), mockk(), mockk()) {
-
-    override fun <R : Any> performRequestResponseSpring(queue: String, request: Any): R {
-        val samhandler110 = TypeSamhandler().apply {
-            samhandler.add(
-                SamhandlerType().apply {
-                    idOff = "idOff"
-                    kodeIdentType = "kodeIdentType"
-                    navnSamh = "navnSamh"
-                    kodeStatus = "GYLD"
-                }
-            )
-        }
-        val samhandlerAvd125 = TypeSamhAvd().apply {
-            samhAvd.add(
-                SamhAvdPraType().apply {
-                    avdNr = "00"
-                    idOffTSS = "idOffTSS"
-                }
-            )
-        }
-        val adresse130 = TypeSamhAdr().apply {
-            adresseSamh.add(
-                AdresseSamhType().apply {
-                    kodeLand = "kodeLand"
-                    poststed = "poststed"
-                    postNr = "postNr"
-                    adrLinjeInfo = AdrLinjeType().apply {
-                        adresseLinje.add("adresseLinje1")
-                        adresseLinje.add("adresseLinje2")
-                        adresseLinje.add("adresseLinje3")
-                    }
-                }
-            )
-        }
-        val samhandler = Samhandler().apply {
-            this.samhandler110 = samhandler110
-            this.samhandlerAvd125 = samhandlerAvd125
-            this.adresse130 = adresse130
-            konto140 = TypeSamhKonto().apply {
-                konto.add(
-                    KontoType().apply {
-                        kodeLand = "kodeLand"
-                        bankNavn = "bankNavn"
-                        gironrInnland = "gironrInnland"
-                        swiftKode = "swiftKode"
-                        kodeValuta = "kodeValuta"
-                        bankKode = "bankKode"
-                        gironrUtland = "gironrUtland"
-                    }
+    override fun <R : Any> performRequestResponseSpring(
+        queue: String,
+        request: Any,
+    ): R {
+        val samhandler110 =
+            TypeSamhandler().apply {
+                samhandler.add(
+                    SamhandlerType().apply {
+                        idOff = "idOff"
+                        kodeIdentType = "kodeIdentType"
+                        navnSamh = "navnSamh"
+                        kodeStatus = "GYLD"
+                    },
                 )
             }
-        }
-        return TssSamhandlerData().apply {
-            tssOutputData = TOutputElementer().apply {
-                svarStatus = SvarStatusType().apply {
-                    alvorligGrad = TssService.TSS_STATUS_OK
-                }
-                samhandlerODataB910 = TypeOD910().apply {
-                    enkeltSamhandler.add(samhandler)
-                }
-                samhandlerODataB940 = TOutputElementer.SamhandlerODataB940().apply {
-                    enkeltSamhandler.add(
-                        TypeKomp940().apply {
-                            this.samhandler110 = samhandler110
-                            this.samhandlerAvd125 = samhandlerAvd125
-                            this.adresse130 = adresse130
-                        }
-                    )
-                }
+        val samhandlerAvd125 =
+            TypeSamhAvd().apply {
+                samhAvd.add(
+                    SamhAvdPraType().apply {
+                        avdNr = "00"
+                        idOffTSS = "idOffTSS"
+                    },
+                )
             }
+        val adresse130 =
+            TypeSamhAdr().apply {
+                adresseSamh.add(
+                    AdresseSamhType().apply {
+                        kodeLand = "kodeLand"
+                        poststed = "poststed"
+                        postNr = "postNr"
+                        adrLinjeInfo =
+                            AdrLinjeType().apply {
+                                adresseLinje.add("adresseLinje1")
+                                adresseLinje.add("adresseLinje2")
+                                adresseLinje.add("adresseLinje3")
+                            }
+                    },
+                )
+            }
+        val samhandler =
+            Samhandler().apply {
+                this.samhandler110 = samhandler110
+                this.samhandlerAvd125 = samhandlerAvd125
+                this.adresse130 = adresse130
+                konto140 =
+                    TypeSamhKonto().apply {
+                        konto.add(
+                            KontoType().apply {
+                                kodeLand = "kodeLand"
+                                bankNavn = "bankNavn"
+                                gironrInnland = "gironrInnland"
+                                swiftKode = "swiftKode"
+                                kodeValuta = "kodeValuta"
+                                bankKode = "bankKode"
+                                gironrUtland = "gironrUtland"
+                            },
+                        )
+                    }
+            }
+        return TssSamhandlerData().apply {
+            tssOutputData =
+                TOutputElementer().apply {
+                    svarStatus =
+                        SvarStatusType().apply {
+                            alvorligGrad = TssService.TSS_STATUS_OK
+                        }
+                    samhandlerODataB910 =
+                        TypeOD910().apply {
+                            enkeltSamhandler.add(samhandler)
+                        }
+                    samhandlerODataB940 =
+                        TOutputElementer.SamhandlerODataB940().apply {
+                            enkeltSamhandler.add(
+                                TypeKomp940().apply {
+                                    this.samhandler110 = samhandler110
+                                    this.samhandlerAvd125 = samhandlerAvd125
+                                    this.adresse130 = adresse130
+                                },
+                            )
+                        }
+                }
         } as R
     }
 }

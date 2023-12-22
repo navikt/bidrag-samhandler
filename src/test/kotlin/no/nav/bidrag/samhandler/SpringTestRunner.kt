@@ -24,7 +24,6 @@ import org.springframework.web.util.UriComponentsBuilder
 @AutoConfigureWireMock
 @EnableMockOAuth2Server
 class SpringTestRunner {
-
     @LocalServerPort
     protected var port: Int = 0
 
@@ -61,30 +60,31 @@ class SpringTestRunner {
     }
 
     val httpHeaderTestRestTemplate
-        get() = HttpHeaderTestRestTemplate(testRestTemplate).apply {
-            add(HttpHeaders.AUTHORIZATION) { generateTestToken() }
-        }
+        get() =
+            HttpHeaderTestRestTemplate(testRestTemplate).apply {
+                add(HttpHeaders.AUTHORIZATION) { generateTestToken() }
+            }
 
     fun generateTestToken(): String {
         val iss = mockOAuth2Server.issuerUrl("aad")
         val newIssuer = iss.newBuilder().host("localhost").build()
-        val token = mockOAuth2Server.issueToken(
-            "aad",
-            "aud-localhost",
-            DefaultOAuth2TokenCallback(
+        val token =
+            mockOAuth2Server.issueToken(
                 "aad",
                 "aud-localhost",
-                JOSEObjectType.JWT.type,
-                listOf("aud-localhost"),
-                mapOf("iss" to newIssuer.toString()),
-                3600
+                DefaultOAuth2TokenCallback(
+                    "aad",
+                    "aud-localhost",
+                    JOSEObjectType.JWT.type,
+                    listOf("aud-localhost"),
+                    mapOf("iss" to newIssuer.toString()),
+                    3600,
+                ),
             )
-        )
         return "Bearer " + token.serialize()
     }
 
     companion object {
-
         private const val LOCALHOST = "http://localhost:"
     }
 }

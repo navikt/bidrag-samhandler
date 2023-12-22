@@ -1,7 +1,6 @@
 package no.nav.bidrag.samhandler.service
 
-import no.nav.bidrag.domain.bool.FlereForekomster
-import no.nav.bidrag.domain.ident.Ident
+import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.samhandler.config.MQProperties
 import no.nav.bidrag.samhandler.exception.SamhandlerNotFoundException
 import no.nav.bidrag.samhandler.exception.TSSServiceException
@@ -19,9 +18,8 @@ import org.springframework.stereotype.Service
 @Service
 class TssService(
     private val mqService: MqClient,
-    private val mqProperties: MQProperties
+    private val mqProperties: MQProperties,
 ) {
-
     @Cacheable("Samhandler")
     fun hentSamhandler(ident: Ident): SamhandlerDto? {
         val request = createTssSamhandlerRequest(ident)
@@ -39,7 +37,10 @@ class TssService(
         return SamhandlersøkeresultatDto(SamhandlerMapper.mapTilSamhandlersøkeresultat(response), flereForekomster)
     }
 
-    private fun validateResponse(tssSamhandlerData: TssSamhandlerData, verdi: Any) {
+    private fun validateResponse(
+        tssSamhandlerData: TssSamhandlerData,
+        verdi: Any,
+    ) {
         val svarstatus = tssSamhandlerData.tssOutputData.svarStatus
         if (svarstatus.alvorligGrad != TSS_STATUS_OK) {
             if (svarstatus.kodeMelding == KODEMELDING_INGEN_FUNNET) {
@@ -52,20 +53,23 @@ class TssService(
         }
     }
 
-    private fun validateSøkResponse(tssSamhandlerData: TssSamhandlerData, verdi: Any): FlereForekomster {
+    private fun validateSøkResponse(
+        tssSamhandlerData: TssSamhandlerData,
+        verdi: Any,
+    ): Boolean {
         val svarstatus = tssSamhandlerData.tssOutputData.svarStatus
         if (svarstatus.alvorligGrad != TSS_STATUS_OK) {
             if (svarstatus.kodeMelding == KODEMELDING_INGEN_FUNNET) {
                 throw SamhandlerNotFoundException("Ingen treff med med inputData=$verdi")
             }
-            if (svarstatus.kodeMelding == KODEMELDING_MER_INFO) return FlereForekomster(true)
-            if (svarstatus.kodeMelding == KODEMELDING_INGEN_FLERE_FOREKOMSTER) return FlereForekomster(false)
+            if (svarstatus.kodeMelding == KODEMELDING_MER_INFO) return true
+            if (svarstatus.kodeMelding == KODEMELDING_INGEN_FLERE_FOREKOMSTER) return false
             throw TSSServiceException("${svarstatus.beskrMelding} - ${svarstatus.alvorligGrad} - ${svarstatus.kodeMelding}")
         }
         if (tssSamhandlerData.tssOutputData.ingenReturData != null) {
             throw SamhandlerNotFoundException("Ingen returdata for TSS request med inputData=$verdi")
         }
-        return FlereForekomster(false)
+        return false
     }
 
     companion object {
