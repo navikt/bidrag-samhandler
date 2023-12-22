@@ -102,18 +102,6 @@
 			<version>${springdoc-openapi-ui.version}</version>
 		</dependency>
 
-		<!--Sikkerhet-->
-<!--		<dependency>-->
-<!--			<groupId>no.nav.security</groupId>-->
-<!--			<artifactId>token-validation-spring</artifactId>-->
-<!--			<version>${token-support.version}</version>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>no.nav.security</groupId>-->
-<!--			<artifactId>token-client-spring</artifactId>-->
-<!--			<version>${token-support.version}</version>-->
-<!--		</dependency>-->
-
 		<!--NAV-->
 		<dependency>
 			<groupId>no.nav.bidrag</groupId>
