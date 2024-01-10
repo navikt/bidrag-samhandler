@@ -1,7 +1,7 @@
 # Bidrag-samhandler
-Mikrotjeneste for oppslag på samhanlder for Bidrag
+Mikrotjeneste for oppslag på samhandler for Bidrag
 
-[![continuous integration](https://github.com/navikt/bidrag-samhandler/actions/workflows/ci.yaml/badge.svg)](https://github.com/navikt/bidrag-dialog/actions/workflows/ci.yaml)
+[![continuous integration](https://github.com/navikt/bidrag-samhandler/actions/workflows/pr.yaml/badge.svg)](https://github.com/navikt/bidrag-dialog/actions/workflows/ci.yaml)
 [![release bidrag-samhandler](https://github.com/navikt/bidrag-samhandler/actions/workflows/release.yaml/badge.svg)](https://github.com/navikt/bidrag-dialog/actions/workflows/release.yaml)
 
 ## Beskrivelse
