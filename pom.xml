@@ -27,7 +27,7 @@
 		<jaxws.version>4.0.2</jaxws.version>
 		<jaxws-maven-plugin.version>4.0.2</jaxws-maven-plugin.version>
 		<mockk.version>1.13.9</mockk.version>
-		<kotlin-logging-jvm.version>6.0.1</kotlin-logging-jvm.version>
+		<kotlin-logging-jvm.version>6.0.3</kotlin-logging-jvm.version>
 		<ktlint.version>1.1.1</ktlint.version>
 	</properties>
 
