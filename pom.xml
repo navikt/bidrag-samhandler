@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.1</version>
+		<version>3.2.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>no.nav</groupId>
@@ -25,7 +25,7 @@
 		<jaxws.version>4.0.2</jaxws.version>
 		<jaxws-maven-plugin.version>4.0.2</jaxws-maven-plugin.version>
 		<mockk.version>1.13.9</mockk.version>
-		<kotlin-logging-jvm.version>6.0.1</kotlin-logging-jvm.version>
+		<kotlin-logging-jvm.version>6.0.3</kotlin-logging-jvm.version>
 		<ktlint.version>1.1.1</ktlint.version>
 	</properties>
 
@@ -46,7 +46,7 @@
 			<dependency>
 				<groupId>com.fasterxml.woodstox</groupId>
 				<artifactId>woodstox-core</artifactId>
-				<version>6.5.1</version>
+				<version>6.6.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
