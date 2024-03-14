@@ -30,7 +30,6 @@ class TssService(
         return SamhandlerMapper.mapTilSamhandler(response)
     }
 
-
     fun hentSamhandlerData(ident: Ident): TssSamhandlerData {
         val request = createTssSamhandlerRequest(ident)
         val response: TssSamhandlerData = mqService.performRequestResponseSpring(mqProperties.tssRequestQueue, request)
