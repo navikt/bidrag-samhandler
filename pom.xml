@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.1</version>
+		<version>3.2.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>no.nav</groupId>
@@ -15,26 +15,29 @@
 	<properties>
 		<java.version>21</java.version>
 		<kotlin.version>1.9.22</kotlin.version>
-		<bidrag-commons.version>20231220091947_b4b43f0</bidrag-commons.version>
-		<bidrag-transport.version>20240102141621_d1f249e</bidrag-transport.version>
+		<bidrag-felles.version>2024.03.04.145243</bidrag-felles.version>
 		<logback-encoder.version>7.4</logback-encoder.version>
 		<springdoc-openapi-ui.version>2.3.0</springdoc-openapi-ui.version>
 		<springframework-cloud.version>4.1.0</springframework-cloud.version>
 		<token-support.version>3.2.0</token-support.version>
-		<bidrag-commons-test.version>1.20231220143255_5a8d330</bidrag-commons-test.version>
 		<kotest.version>5.8.0</kotest.version>
 		<jakarta.xml.ws-api.version>4.0.1</jakarta.xml.ws-api.version>
 		<jaxws.version>4.0.2</jaxws.version>
 		<jaxws-maven-plugin.version>4.0.2</jaxws-maven-plugin.version>
 		<mockk.version>1.13.9</mockk.version>
-		<kotlin-logging-jvm.version>6.0.1</kotlin-logging-jvm.version>
+		<kotlin-logging-jvm.version>6.0.3</kotlin-logging-jvm.version>
 		<ktlint.version>1.1.1</ktlint.version>
 	</properties>
 
 	<repositories>
 		<repository>
 			<id>github</id>
-			<url>https://maven.pkg.github.com/navikt/bidrag-commons</url>
+			<url>https://maven.pkg.github.com/navikt/bidrag-felles</url>
+		</repository>
+		<repository>
+			<id>confluent</id>
+			<name>Confluent kafka</name>
+			<url>https://packages.confluent.io/maven/</url>
 		</repository>
 	</repositories>
 
@@ -43,7 +46,7 @@
 			<dependency>
 				<groupId>com.fasterxml.woodstox</groupId>
 				<artifactId>woodstox-core</artifactId>
-				<version>6.5.1</version>
+				<version>6.6.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -105,8 +108,8 @@
 		<!--NAV-->
 		<dependency>
 			<groupId>no.nav.bidrag</groupId>
-			<artifactId>bidrag-commons</artifactId>
-			<version>${bidrag-commons.version}</version>
+			<artifactId>bidrag-commons-felles</artifactId>
+			<version>${bidrag-felles.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
@@ -128,8 +131,8 @@
 		</dependency>
 		<dependency>
 			<groupId>no.nav.bidrag</groupId>
-			<artifactId>bidrag-transport</artifactId>
-			<version>${bidrag-transport.version}</version>
+			<artifactId>bidrag-transport-felles</artifactId>
+			<version>${bidrag-felles.version}</version>
 		</dependency>
 
 		<!--XML handling dependencies-->
@@ -258,8 +261,8 @@
 		</dependency>
 		<dependency>
 			<groupId>no.nav.bidrag</groupId>
-			<artifactId>bidrag-commons-test</artifactId>
-			<version>${bidrag-commons-test.version}</version>
+			<artifactId>bidrag-commons-test-felles</artifactId>
+			<version>${bidrag-felles.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

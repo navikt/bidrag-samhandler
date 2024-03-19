@@ -8,6 +8,7 @@ import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import no.nav.security.token.support.core.api.Protected
+import no.rtv.namespacetss.TssSamhandlerData
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -25,6 +26,17 @@ class SamhandlerController(val tssService: TssService) {
         @RequestBody ident: Ident,
     ): SamhandlerDto? {
         return tssService.hentSamhandler(ident)
+    }
+
+    @PostMapping("/samhandlerData")
+    @Operation(
+        description = "Henter samhandler for ident og lever ut all data på identen slik det hentes fra TSS",
+        security = [SecurityRequirement(name = "bearer-key")],
+    )
+    fun hentSamhandlerData(
+        @RequestBody ident: Ident,
+    ): TssSamhandlerData {
+        return tssService.hentSamhandlerData(ident)
     }
 
     @GetMapping("/samhandler")
