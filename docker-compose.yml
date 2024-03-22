@@ -1,0 +1,10 @@
+version: '2'
+services:
+  database:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: cloudsqliamuser
+      POSTGRES_PASSWORD: samhandleradmin
+      POSTGRES_DB: default_database

@@ -49,6 +49,13 @@ spec:
       memory: 512Mi
   envFrom:
     - secret: bidrag-samhandler-mq-password
+  gcp:
+    sqlInstances:
+      - name: {{ database.navn }}
+        type: POSTGRES_15
+        databases:
+          - name: bidrag-samhandler-db
+            envVarPrefix: DB
   ingresses:
   {{#each ingresses as |url|}}
     - {{url}}

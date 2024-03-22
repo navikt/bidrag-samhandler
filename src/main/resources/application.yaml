@@ -25,3 +25,13 @@ ibm:
     application-name: BIDRAG-SAMHANDLER
     tssRequestQueue: ${MQ_TSS_REQUEST_QUEUE}
     use-authentication-m-q-c-s-p: true
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?user=${DB_USERNAME}&password=${DB_PASSWORD}&reWriteBatchedInserts=true
+  flyway:
+    enabled: true
+    locations: classpath:/db/migration
+  jpa:
+    database: postgresql
