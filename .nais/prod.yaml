@@ -1,6 +1,8 @@
 name: bidrag-samhandler
 ingresses:
   - https://bidrag-samhandler.intern.nav.no
+database:
+  navn: bidrag-samhandler-prod
 env:
   MQ_CONN_NAME: mpls02.adeo.no(1414)
   MQ_HOST: mpls02.adeo.no

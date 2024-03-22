@@ -24,3 +24,8 @@ ibm:
     password: passw0rd
     application-name: bidrag-samhandler
     tssRequestQueue: DEV.QUEUE.1
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
