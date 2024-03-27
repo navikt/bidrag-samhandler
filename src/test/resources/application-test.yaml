@@ -29,3 +29,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:/db/migration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/default_database?user=cloudsqliamuser&password=samhandleradmin&reWriteBatchedInserts=true
+    type: com.zaxxer.hikari.HikariDataSource
