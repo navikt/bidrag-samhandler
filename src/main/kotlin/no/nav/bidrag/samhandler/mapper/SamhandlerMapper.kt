@@ -6,6 +6,7 @@ import no.nav.bidrag.domene.land.Landkode3
 import no.nav.bidrag.transport.samhandler.AdresseDto
 import no.nav.bidrag.transport.samhandler.KontonummerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
+import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.rtv.namespacetss.Samhandler
 import no.rtv.namespacetss.TssSamhandlerData
 import no.rtv.namespacetss.TypeKomp940
@@ -14,6 +15,70 @@ import no.rtv.namespacetss.TypeSamhAvd
 import no.rtv.namespacetss.TypeSamhandler
 
 object SamhandlerMapper {
+    fun mapTilSamhandlerDto(samhandler: no.nav.bidrag.samhandler.persistence.entity.Samhandler): SamhandlerDto {
+        return samhandler.let {
+            SamhandlerDto(
+                tssId = SamhandlerId(it.ident),
+                navn = it.navn,
+                offentligId = samhandler.offentligId,
+                offentligIdType = samhandler.offentligIdType,
+                adresse =
+                    AdresseDto(
+                        it.adresselinje1,
+                        adresselinje2 = it.adresselinje2,
+                        adresselinje3 = it.adresselinje3,
+                        postnr = it.postnr,
+                        poststed = it.poststed,
+                        land = it.land?.let { land -> Landkode3(land) },
+                    ),
+                kontonummer =
+                    KontonummerDto(
+                        norskKontonummer = it.norskkontonr,
+                        iban = it.iban,
+                        swift = it.swift,
+                        banknavn = it.banknavn,
+                        landkodeBank = it.banklandkode?.let { banklandkode -> Landkode3(banklandkode) },
+                        bankCode = it.bankcode,
+                        valutakode = it.valutakode,
+                    ),
+            )
+        }
+    }
+
+    fun mapTilSamhandlersøkeresultatDto(
+        samhandlere: List<no.nav.bidrag.samhandler.persistence.entity.Samhandler>,
+    ): SamhandlersøkeresultatDto {
+        return SamhandlersøkeresultatDto(
+            samhandlere =
+                samhandlere.map {
+                    mapTilSamhandlerDto(it)
+                },
+            flereForekomster = samhandlere.size >= 2,
+        )
+    }
+
+    fun mapTilSamhandler(samhandlerDto: SamhandlerDto): no.nav.bidrag.samhandler.persistence.entity.Samhandler {
+        return no.nav.bidrag.samhandler.persistence.entity.Samhandler(
+            ident = samhandlerDto.tssId.verdi,
+            navn = samhandlerDto.navn ?: error("Samhandler kan ikke opprettes uten navn."),
+            offentligId = samhandlerDto.offentligId,
+            offentligIdType = samhandlerDto.offentligIdType,
+            norskkontonr = samhandlerDto.kontonummer?.norskKontonummer,
+            iban = samhandlerDto.kontonummer?.iban,
+            swift = samhandlerDto.kontonummer?.swift,
+            banknavn = samhandlerDto.kontonummer?.banknavn,
+            banklandkode = samhandlerDto.kontonummer?.landkodeBank?.verdi,
+            valutakode = samhandlerDto.kontonummer?.valutakode,
+            bankcode = samhandlerDto.kontonummer?.bankCode,
+            adresselinje1 = samhandlerDto.adresse?.adresselinje1,
+            adresselinje2 = samhandlerDto.adresse?.adresselinje2,
+            adresselinje3 = samhandlerDto.adresse?.adresselinje3,
+            postnr = samhandlerDto.adresse?.postnr,
+            poststed = samhandlerDto.adresse?.poststed,
+            land = samhandlerDto.adresse?.land?.verdi,
+        )
+    }
+
     fun mapTilSamhandler(tssSamhandlerData: TssSamhandlerData): SamhandlerDto? {
         val samhandler =
             tssSamhandlerData.tssOutputData.samhandlerODataB910?.enkeltSamhandler?.firstOrNull()
