@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS samhandlere
 (
     id                  integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (INCREMENT 1 START 1 MINVALUE 1),
-    ident               text NOT NULL,
+    ident               text NOT NULL UNIQUE,
     navn                text NOT NULL,
     offentlig_id        text,
     offentlig_id_type   text,
