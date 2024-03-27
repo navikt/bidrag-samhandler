@@ -30,6 +30,10 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?user=${DB_USERNAME}&password=${DB_PASSWORD}&reWriteBatchedInserts=true
+    hikari:
+      max-lifetime: 900000
+      maximum-pool-size: 10
+      minimum-idle: 1
   flyway:
     enabled: true
     locations: classpath:/db/migration
