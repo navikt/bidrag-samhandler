@@ -21,3 +21,6 @@ azure_access_inbound:
   - application: bidrag-aktoerregister
     namespace: bidrag
     cluser: dev-gcp
+  - application: bisys
+    namespace: bidrag
+    cluster: dev-fss
