@@ -20,3 +20,6 @@ azure_access_inbound:
   - application: bidrag-aktoerregister
     namespace: bidrag
     cluser: prod-gcp
+  - application: bisys
+    namespace: bidrag
+    cluster: prod-fss
