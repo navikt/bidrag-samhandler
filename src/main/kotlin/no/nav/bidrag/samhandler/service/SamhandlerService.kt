@@ -3,7 +3,9 @@ package no.nav.bidrag.samhandler.service
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
+import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
+import no.nav.bidrag.transport.samhandler.SamhandlerSøk
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import org.springframework.http.ResponseEntity
@@ -38,6 +40,12 @@ class SamhandlerService(
         }
 
         return tssService.søkSamhandler(søkSamhandlerQuery)
+    }
+
+    fun samhandlerSøk(samhandlerSøk: SamhandlerSøk): SamhandlersøkeresultatDto {
+        val samhandlere = samhandlerRepository.findAll(SamhandlerSøkSpec.søkPåAlleParameter(samhandlerSøk))
+
+        return SamhandlerMapper.mapTilSamhandlersøkeresultatDto(samhandlere)
     }
 
     @Transactional

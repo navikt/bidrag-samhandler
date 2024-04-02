@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.samhandler.service.SamhandlerService
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
+import no.nav.bidrag.transport.samhandler.SamhandlerSøk
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import no.nav.security.token.support.core.api.Protected
@@ -35,8 +36,18 @@ class SamhandlerController(
         description = "Søker etter samhandlere basert på navn, område og postnummer",
         security = [SecurityRequirement(name = "bearer-key")],
     )
+    @Deprecated(message = "Søk på samhandler mot TSS.", replaceWith = ReplaceWith("/samhandlersok"))
     fun søkSamhandler(søkSamhandlerQuery: SøkSamhandlerQuery): SamhandlersøkeresultatDto {
         return samhandlerService.søkSamhandler(søkSamhandlerQuery)
+    }
+
+    @GetMapping("/samhandlersok")
+    @Operation(
+        description = "Søker etter samhandlere.",
+        security = [SecurityRequirement(name = "bearer-key")],
+    )
+    fun samhandlerSøk(samhandlerSøk: SamhandlerSøk): SamhandlersøkeresultatDto {
+        return samhandlerService.samhandlerSøk(samhandlerSøk)
     }
 
     @PostMapping("/opprettSamhandler")
