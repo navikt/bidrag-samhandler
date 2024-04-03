@@ -8,6 +8,8 @@ object SamhandlerSøkSpec {
     fun søkPåAlleParameter(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
         return Specification
             .where(navnEquals(samhandlerSøk))
+            .and(identEquals(samhandlerSøk))
+            .and(offentligIdEquals(samhandlerSøk))
             .and(postnummerEquals(samhandlerSøk))
             .and(poststedEquals(samhandlerSøk))
             .and(kontonummerEquals(samhandlerSøk))
@@ -26,6 +28,32 @@ object SamhandlerSøkSpec {
                 criteriaBuilder.equal(
                     criteriaBuilder.upper(root.get("navn")),
                     samhandlerSøk.navn!!.uppercase(),
+                )
+            }
+        }
+    }
+
+    private fun identEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
+        return Specification<Samhandler> { root, _, criteriaBuilder ->
+            if (samhandlerSøk.ident == null) {
+                criteriaBuilder.conjunction()
+            } else {
+                criteriaBuilder.equal(
+                    criteriaBuilder.upper(root.get("ident")),
+                    samhandlerSøk.ident!!.uppercase(),
+                )
+            }
+        }
+    }
+
+    private fun offentligIdEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
+        return Specification<Samhandler> { root, _, criteriaBuilder ->
+            if (samhandlerSøk.offentligId == null) {
+                criteriaBuilder.conjunction()
+            } else {
+                criteriaBuilder.equal(
+                    criteriaBuilder.upper(root.get("offentlig_id")),
+                    samhandlerSøk.offentligId!!.uppercase(),
                 )
             }
         }
