@@ -41,7 +41,7 @@ class SamhandlerController(
         return samhandlerService.søkSamhandler(søkSamhandlerQuery)
     }
 
-    @GetMapping("/samhandlersok")
+    @PostMapping("/samhandlersok")
     @Operation(
         description = "Søker etter samhandlere.",
         security = [SecurityRequirement(name = "bearer-key")],
