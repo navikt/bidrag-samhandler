@@ -7,7 +7,7 @@ import org.springframework.data.jpa.domain.Specification
 object SamhandlerSøkSpec {
     fun søkPåAlleParameter(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
         return Specification
-            .where(navnEquals(samhandlerSøk))
+            .where(navnLike(samhandlerSøk))
             .and(identEquals(samhandlerSøk))
             .and(offentligIdEquals(samhandlerSøk))
             .and(postnummerEquals(samhandlerSøk))
@@ -20,14 +20,14 @@ object SamhandlerSøkSpec {
             .and(bankcodeEquals(samhandlerSøk))
     }
 
-    private fun navnEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
+    private fun navnLike(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
         return Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.navn == null) {
                 criteriaBuilder.conjunction()
             } else {
-                criteriaBuilder.equal(
+                criteriaBuilder.like(
                     criteriaBuilder.upper(root.get("navn")),
-                    samhandlerSøk.navn!!.uppercase(),
+                    "%" + samhandlerSøk.navn!!.uppercase() + "%",
                 )
             }
         }
