@@ -107,9 +107,9 @@ object SamhandlerMapper {
                 områdekode = mapOmrådekode(samhandler),
                 adresse = mapTilAdresse(it.adresse130),
                 kontonummer = mapToKontonummer(it),
-                kontaktperson = samhandler.kontakter150.enKontakt.find { kontakt -> kontakt.kodeKontaktType == "KNTB" }?.kontakt,
-                kontaktEpost = samhandler.kontakter150.enKontakt.find { kontakt -> kontakt.kodeKontaktType == "EPOS" }?.kontakt,
-                kontaktTelefon = samhandler.kontakter150.enKontakt.find { kontakt -> kontakt.kodeKontaktType == "TLF" }?.kontakt,
+                kontaktperson = samhandler.kontakter150?.enKontakt?.find { kontakt -> kontakt.kodeKontaktType == "KNTB" }?.kontakt,
+                kontaktEpost = samhandler.kontakter150?.enKontakt?.find { kontakt -> kontakt.kodeKontaktType == "EPOS" }?.kontakt,
+                kontaktTelefon = samhandler.kontakter150?.enKontakt?.find { kontakt -> kontakt.kodeKontaktType == "TLF" }?.kontakt,
             )
         }
     }
@@ -117,7 +117,7 @@ object SamhandlerMapper {
     private fun mapOmrådekode(samhandler: Samhandler) =
         Områdekode.entries.find { områdekode ->
             områdekode.tssOmrådekode ==
-                samhandler.samhandlerFag120.samhFag.find { samfag ->
+                samhandler.samhandlerFag120?.samhFag?.find { samfag ->
                     samfag.gyldigFag == "J"
                 }?.kodeFagOmrade
         }
