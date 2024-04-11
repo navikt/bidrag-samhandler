@@ -6,22 +6,28 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Version
+import org.hibernate.annotations.ColumnDefault
+import org.hibernate.annotations.DynamicInsert
 import java.time.LocalDateTime
 
 @Entity(name = "samhandlere")
+@DynamicInsert
 data class Samhandler(
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
     @Column(name = "ident")
-    val ident: String = "",
+    @ColumnDefault("nextval('ident_seq')")
+    val ident: String? = null,
     @Column(name = "navn")
     val navn: String = "",
     @Column(name = "offentlig_id")
     val offentligId: String? = null,
     @Column(name = "offentlig_id_type")
     val offentligIdType: String? = null,
+    @Column(name = "omradekode")
+    val områdekode: String? = null,
     @Column(name = "norskkontonr")
     val norskkontonr: String? = null,
     @Column(name = "iban")
@@ -48,6 +54,14 @@ data class Samhandler(
     val poststed: String? = null,
     @Column(name = "land")
     val land: String? = null,
+    @Column(name = "kontaktperson")
+    val kontaktperson: String? = null,
+    @Column(name = "kontakt_epost")
+    val kontaktEpost: String? = null,
+    @Column(name = "kontakt_telefon")
+    val kontaktTelefon: String? = null,
+    @Column(name = "notat")
+    val notat: String? = null,
     @Version
     @Column(name = "endret_tidspunkt")
     var endretTidspunkt: LocalDateTime? = null,

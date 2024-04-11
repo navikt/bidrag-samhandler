@@ -9,6 +9,7 @@ import no.nav.bidrag.transport.samhandler.SamhandlerSøk
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import no.nav.security.token.support.core.api.Protected
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -68,7 +69,7 @@ class SamhandlerController(
     )
     fun oppdaterSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
-    ) {
-        samhandlerService.oppdaterSamhandler(samhandlerDto)
+    ): ResponseEntity<*> {
+        return samhandlerService.oppdaterSamhandler(samhandlerDto)
     }
 }
