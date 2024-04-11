@@ -24,10 +24,11 @@ class SamhandlerService(
         }
 
         val hentSamhandler = tssService.hentSamhandler(ident)
-        hentSamhandler?.let { samhandlerRepository.save(SamhandlerMapper.mapTilSamhandler(hentSamhandler)) }
+        hentSamhandler?.let { samhandlerRepository.save(SamhandlerMapper.mapTilSamhandler(hentSamhandler, true)) }
         return hentSamhandler
     }
 
+    @Deprecated("Søker mot tss med gammel query.", replaceWith = ReplaceWith("samhandlerService.samhandlerSøk(samhandlerSøk)"))
     fun søkSamhandler(søkSamhandlerQuery: SøkSamhandlerQuery): SamhandlersøkeresultatDto {
         val samhandlere =
             søkSamhandlerQuery.postnummer?.let {
@@ -56,13 +57,19 @@ class SamhandlerService(
 
     @Transactional
     fun oppdaterSamhandler(samhandlerDto: SamhandlerDto): ResponseEntity<*> {
-        val samhandler = samhandlerRepository.findByIdent(samhandlerDto.tssId.verdi) ?: return ResponseEntity.notFound().build<Any>()
+        val samhandlerIdent =
+            samhandlerDto.tssId?.verdi ?: return ResponseEntity.badRequest()
+                .body("Oppdatering av samhandler må ha angitt samhandlerId!")
+        val samhandler = samhandlerRepository.findByIdent(samhandlerIdent) ?: return ResponseEntity.notFound().build<Any>()
 
         val oppdatertSamhandler =
             samhandler.copy(
-                navn = samhandlerDto.navn ?: return ResponseEntity.badRequest().body("Navn kan ikke være tomt!"),
+                navn =
+                    samhandlerDto.navn ?: return ResponseEntity.badRequest()
+                        .body("Navn kan ikke være tomt! Mangler navn fra TSS må dette opprettes."),
                 offentligId = samhandlerDto.offentligId,
                 offentligIdType = samhandlerDto.offentligIdType,
+                områdekode = samhandlerDto.områdekode?.name,
                 norskkontonr = samhandlerDto.kontonummer?.norskKontonummer,
                 iban = samhandlerDto.kontonummer?.iban,
                 swift = samhandlerDto.kontonummer?.swift,
@@ -76,6 +83,10 @@ class SamhandlerService(
                 postnr = samhandlerDto.adresse?.postnr,
                 poststed = samhandlerDto.adresse?.poststed,
                 land = samhandlerDto.adresse?.land?.verdi,
+                kontaktperson = samhandlerDto.kontaktperson,
+                kontaktEpost = samhandlerDto.kontaktEpost,
+                kontaktTelefon = samhandlerDto.kontaktTelefon,
+                notat = samhandlerDto.notat,
             )
         samhandlerRepository.save(oppdatertSamhandler)
         return ResponseEntity.ok().build<Any>()

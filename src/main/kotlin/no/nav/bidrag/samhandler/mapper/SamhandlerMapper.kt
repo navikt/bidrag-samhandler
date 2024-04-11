@@ -5,6 +5,7 @@ import no.nav.bidrag.domene.ident.SamhandlerId
 import no.nav.bidrag.domene.land.Landkode3
 import no.nav.bidrag.transport.samhandler.AdresseDto
 import no.nav.bidrag.transport.samhandler.KontonummerDto
+import no.nav.bidrag.transport.samhandler.Områdekode
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.rtv.namespacetss.Samhandler
@@ -18,10 +19,11 @@ object SamhandlerMapper {
     fun mapTilSamhandlerDto(samhandler: no.nav.bidrag.samhandler.persistence.entity.Samhandler): SamhandlerDto {
         return samhandler.let {
             SamhandlerDto(
-                tssId = SamhandlerId(it.ident),
+                tssId = it.ident?.let { ident -> SamhandlerId(ident) },
                 navn = it.navn,
                 offentligId = samhandler.offentligId,
                 offentligIdType = samhandler.offentligIdType,
+                områdekode = samhandler.områdekode?.let { områdekode -> Områdekode.valueOf(områdekode) },
                 adresse =
                     AdresseDto(
                         it.adresselinje1,
@@ -41,6 +43,10 @@ object SamhandlerMapper {
                         bankCode = it.bankcode,
                         valutakode = it.valutakode,
                     ),
+                kontaktperson = it.kontaktperson,
+                kontaktEpost = it.kontaktEpost,
+                kontaktTelefon = it.kontaktTelefon,
+                notat = it.notat,
             )
         }
     }
@@ -57,12 +63,16 @@ object SamhandlerMapper {
         )
     }
 
-    fun mapTilSamhandler(samhandlerDto: SamhandlerDto): no.nav.bidrag.samhandler.persistence.entity.Samhandler {
+    fun mapTilSamhandler(
+        samhandlerDto: SamhandlerDto,
+        fraTss: Boolean = false,
+    ): no.nav.bidrag.samhandler.persistence.entity.Samhandler {
         return no.nav.bidrag.samhandler.persistence.entity.Samhandler(
-            ident = samhandlerDto.tssId.verdi,
-            navn = samhandlerDto.navn ?: error("Samhandler kan ikke opprettes uten navn."),
+            ident = if (fraTss) samhandlerDto.tssId?.verdi else null,
+            navn = samhandlerDto.navn ?: if (fraTss) "" else error("Samhandler kan ikke opprettes uten navn."),
             offentligId = samhandlerDto.offentligId,
             offentligIdType = samhandlerDto.offentligIdType,
+            områdekode = samhandlerDto.områdekode?.name,
             norskkontonr = samhandlerDto.kontonummer?.norskKontonummer,
             iban = samhandlerDto.kontonummer?.iban,
             swift = samhandlerDto.kontonummer?.swift,
@@ -76,6 +86,10 @@ object SamhandlerMapper {
             postnr = samhandlerDto.adresse?.postnr,
             poststed = samhandlerDto.adresse?.poststed,
             land = samhandlerDto.adresse?.land?.verdi,
+            kontaktperson = samhandlerDto.kontaktperson,
+            kontaktEpost = samhandlerDto.kontaktEpost,
+            kontaktTelefon = samhandlerDto.kontaktTelefon,
+            notat = samhandlerDto.notat,
         )
     }
 
@@ -90,11 +104,23 @@ object SamhandlerMapper {
                 navn = samhandlerType?.navnSamh.trimToNull(),
                 offentligId = samhandlerType?.idOff.trimToNull(),
                 offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
+                områdekode = mapOmrådekode(samhandler),
                 adresse = mapTilAdresse(it.adresse130),
                 kontonummer = mapToKontonummer(it),
+                kontaktperson = samhandler.kontakter150.enKontakt.find { kontakt -> kontakt.kodeKontaktType == "KNTB" }?.kontakt,
+                kontaktEpost = samhandler.kontakter150.enKontakt.find { kontakt -> kontakt.kodeKontaktType == "EPOS" }?.kontakt,
+                kontaktTelefon = samhandler.kontakter150.enKontakt.find { kontakt -> kontakt.kodeKontaktType == "TLF" }?.kontakt,
             )
         }
     }
+
+    private fun mapOmrådekode(samhandler: Samhandler) =
+        Områdekode.entries.find { områdekode ->
+            områdekode.tssOmrådekode ==
+                samhandler.samhandlerFag120.samhFag.find { samfag ->
+                    samfag.gyldigFag == "J"
+                }?.kodeFagOmrade
+        }
 
     fun mapTilSamhandlersøkeresultat(tssSamhandlerData: TssSamhandlerData): List<SamhandlerDto> {
         return tssSamhandlerData.tssOutputData.samhandlerODataB940.enkeltSamhandler
