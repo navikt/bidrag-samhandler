@@ -10,7 +10,9 @@ import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class SamhandlerService(
@@ -39,21 +41,25 @@ class SamhandlerService(
         if (samhandlere.isNotEmpty()) {
             return SamhandlerMapper.mapTilSamhandlersøkeresultatDto(samhandlere)
         }
-
         return tssService.søkSamhandler(søkSamhandlerQuery)
     }
 
     fun samhandlerSøk(samhandlerSøk: SamhandlerSøk): SamhandlersøkeresultatDto {
         val samhandlere = samhandlerRepository.findAll(SamhandlerSøkSpec.søkPåAlleParameter(samhandlerSøk))
-
         return SamhandlerMapper.mapTilSamhandlersøkeresultatDto(samhandlere)
     }
 
-    @Transactional
-    fun opprettSamhandler(samhandlerDto: SamhandlerDto) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun opprettSamhandler(samhandlerDto: SamhandlerDto): Int {
         val samhandler = SamhandlerMapper.mapTilSamhandler(samhandlerDto)
-        samhandlerRepository.save(samhandler)
+        return samhandlerRepository.save(samhandler).id
     }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun hentSamhandlerPåId(samhandlerId: Int) =
+        samhandlerRepository.findById(samhandlerId).getOrNull()?.let {
+            SamhandlerMapper.mapTilSamhandlerDto(it)
+        }
 
     @Transactional
     fun oppdaterSamhandler(samhandlerDto: SamhandlerDto): ResponseEntity<*> {

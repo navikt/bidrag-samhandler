@@ -58,8 +58,9 @@ class SamhandlerController(
     )
     fun opprettSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
-    ) {
-        samhandlerService.opprettSamhandler(samhandlerDto)
+    ): ResponseEntity<*> {
+        val samhandlerId = samhandlerService.opprettSamhandler(samhandlerDto)
+        return ResponseEntity.ok(samhandlerService.hentSamhandlerPåId(samhandlerId))
     }
 
     @PutMapping("/samhandler")
