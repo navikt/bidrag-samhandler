@@ -64,7 +64,7 @@ class SamhandlerService(
     @Transactional
     fun oppdaterSamhandler(samhandlerDto: SamhandlerDto): ResponseEntity<*> {
         val samhandlerIdent =
-            samhandlerDto.tssId?.verdi ?: return ResponseEntity.badRequest()
+            samhandlerDto.samhandlerId?.verdi ?: return ResponseEntity.badRequest()
                 .body("Oppdatering av samhandler må ha angitt samhandlerId!")
         val samhandler = samhandlerRepository.findByIdent(samhandlerIdent) ?: return ResponseEntity.notFound().build<Any>()
 

@@ -19,7 +19,7 @@ object SamhandlerMapper {
     fun mapTilSamhandlerDto(samhandler: no.nav.bidrag.samhandler.persistence.entity.Samhandler): SamhandlerDto {
         return samhandler.let {
             SamhandlerDto(
-                tssId = it.ident?.let { ident -> SamhandlerId(ident) },
+                samhandlerId = it.ident?.let { ident -> SamhandlerId(ident) },
                 navn = it.navn,
                 offentligId = samhandler.offentligId,
                 offentligIdType = samhandler.offentligIdType,
@@ -68,7 +68,7 @@ object SamhandlerMapper {
         fraTss: Boolean = false,
     ): no.nav.bidrag.samhandler.persistence.entity.Samhandler {
         return no.nav.bidrag.samhandler.persistence.entity.Samhandler(
-            ident = if (fraTss) samhandlerDto.tssId?.verdi else null,
+            ident = if (fraTss) samhandlerDto.samhandlerId?.verdi else null,
             navn = samhandlerDto.navn ?: if (fraTss) "" else error("Samhandler kan ikke opprettes uten navn."),
             offentligId = samhandlerDto.offentligId,
             offentligIdType = samhandlerDto.offentligIdType,
