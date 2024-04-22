@@ -19,7 +19,7 @@ object SamhandlerMapper {
     fun mapTilSamhandlerDto(samhandler: no.nav.bidrag.samhandler.persistence.entity.Samhandler): SamhandlerDto {
         return samhandler.let {
             SamhandlerDto(
-                tssId = it.ident?.let { ident -> SamhandlerId(ident) },
+                samhandlerId = it.ident?.let { ident -> SamhandlerId(ident) },
                 navn = it.navn,
                 offentligId = samhandler.offentligId,
                 offentligIdType = samhandler.offentligIdType,
@@ -68,7 +68,7 @@ object SamhandlerMapper {
         fraTss: Boolean = false,
     ): no.nav.bidrag.samhandler.persistence.entity.Samhandler {
         return no.nav.bidrag.samhandler.persistence.entity.Samhandler(
-            ident = if (fraTss) samhandlerDto.tssId?.verdi else null,
+            ident = if (fraTss) samhandlerDto.samhandlerId?.verdi else null,
             navn = samhandlerDto.navn ?: if (fraTss) "" else error("Samhandler kan ikke opprettes uten navn."),
             offentligId = samhandlerDto.offentligId,
             offentligIdType = samhandlerDto.offentligIdType,
@@ -100,7 +100,7 @@ object SamhandlerMapper {
         return samhandler?.let {
             val samhandlerType = gyldigSamhandler(it.samhandler110)
             SamhandlerDto(
-                tssId = mapTilTssEksternId(it.samhandlerAvd125),
+                samhandlerId = mapTilTssEksternId(it.samhandlerAvd125),
                 navn = samhandlerType?.navnSamh.trimToNull(),
                 offentligId = samhandlerType?.idOff.trimToNull(),
                 offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
@@ -130,7 +130,7 @@ object SamhandlerMapper {
     private fun mapSamhandler(enkeltSamhandler: TypeKomp940): SamhandlerDto {
         val samhandlerType = gyldigSamhandler(enkeltSamhandler.samhandler110)
         return SamhandlerDto(
-            tssId = mapTilTssEksternId(enkeltSamhandler.samhandlerAvd125),
+            samhandlerId = mapTilTssEksternId(enkeltSamhandler.samhandlerAvd125),
             navn = samhandlerType?.navnSamh.trimToNull(),
             offentligId = samhandlerType?.idOff.trimToNull(),
             offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
