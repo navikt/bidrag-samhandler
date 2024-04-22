@@ -25,7 +25,7 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
     fun `post for Ident retunerer korrekt bygd SamhandlerDto`() {
         val forventetResultat =
             SamhandlerDto(
-                tssId = SamhandlerId("idOffTSS"),
+                samhandlerId = SamhandlerId("idOffTSS"),
                 navn = "navnSamh",
                 offentligId = "idOff",
                 offentligIdType = "kodeIdentType",
@@ -63,7 +63,7 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
             SamhandlersøkeresultatDto(
                 listOf(
                     SamhandlerDto(
-                        tssId = SamhandlerId("idOffTSS"),
+                        samhandlerId = SamhandlerId("idOffTSS"),
                         navn = "navnSamh",
                         offentligId = "idOff",
                         offentligIdType = "kodeIdentType",
