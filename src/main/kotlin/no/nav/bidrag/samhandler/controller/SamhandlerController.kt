@@ -1,6 +1,10 @@
 package no.nav.bidrag.samhandler.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.samhandler.service.SamhandlerService
@@ -26,10 +30,26 @@ class SamhandlerController(
         description = "Henter samhandler for ident.",
         security = [SecurityRequirement(name = "bearer-key")],
     )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Returnerer samhandler.",
+                content = [
+                    ((Content(schema = Schema(implementation = SamhandlerDto::class)))),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "204",
+                description = "Samhandler finnes ikke.",
+            ),
+        ],
+    )
     fun hentSamhandler(
         @RequestBody ident: Ident,
-    ): SamhandlerDto? {
-        return samhandlerService.hentSamhandler(ident)
+    ): ResponseEntity<*> {
+        val samhandler = samhandlerService.hentSamhandler(ident) ?: return ResponseEntity.notFound().build<Any>()
+        return ResponseEntity.ok(samhandler)
     }
 
     @GetMapping("/samhandler")
