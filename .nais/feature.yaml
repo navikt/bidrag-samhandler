@@ -2,7 +2,7 @@ name: bidrag-samhandler-feature
 ingresses:
   - https://bidrag-samhandler-feature.intern.dev.nav.no
 database:
-  navn: bidrag-samhandler-feature
+  navn: bidrag-samhandler-feature-1
 env:
   MQ_CONN_NAME: b27apvl220.preprod.local(1413)
   MQ_HOST: b27apvl220.preprod.local
