@@ -50,7 +50,11 @@ spec:
     - secret: bidrag-samhandler-mq-password
   gcp:
     sqlInstances:
-      - cascadingDelete: true
+      - name: {{ database.navn }}
+        type: POSTGRES_15
+        databases:
+          - name: bidrag-samhandler
+            envVarPrefix: DB
   ingresses:
   {{#each ingresses as |url|}}
     - {{url}}
