@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS samhandlere
     navn                text NOT NULL,
     offentlig_id        text,
     offentlig_id_type   text,
+    sprak               text,
     omradekode          text,
     norskkontonr        text,
     iban                text,
