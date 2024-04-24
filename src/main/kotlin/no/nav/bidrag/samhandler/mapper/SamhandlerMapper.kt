@@ -23,6 +23,7 @@ object SamhandlerMapper {
                 navn = it.navn,
                 offentligId = samhandler.offentligId,
                 offentligIdType = samhandler.offentligIdType,
+                språk = samhandler.språk,
                 områdekode = samhandler.områdekode?.let { områdekode -> Områdekode.valueOf(områdekode) },
                 adresse =
                     AdresseDto(
@@ -72,6 +73,7 @@ object SamhandlerMapper {
             navn = samhandlerDto.navn ?: if (fraTss) "" else error("Samhandler kan ikke opprettes uten navn."),
             offentligId = samhandlerDto.offentligId,
             offentligIdType = samhandlerDto.offentligIdType,
+            språk = samhandlerDto.språk,
             områdekode = samhandlerDto.områdekode?.name,
             norskkontonr = samhandlerDto.kontonummer?.norskKontonummer,
             iban = samhandlerDto.kontonummer?.iban,
@@ -104,6 +106,7 @@ object SamhandlerMapper {
                 navn = samhandlerType?.navnSamh.trimToNull(),
                 offentligId = samhandlerType?.idOff.trimToNull(),
                 offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
+                språk = samhandlerType?.kodeSpraak,
                 områdekode = mapOmrådekode(samhandler),
                 adresse = mapTilAdresse(it.adresse130),
                 kontonummer = mapToKontonummer(it),

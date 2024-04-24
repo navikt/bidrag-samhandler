@@ -26,6 +26,8 @@ data class Samhandler(
     val offentligId: String? = null,
     @Column(name = "offentlig_id_type")
     val offentligIdType: String? = null,
+    @Column(name = "sprak")
+    val språk: String? = null,
     @Column(name = "omradekode")
     val områdekode: String? = null,
     @Column(name = "norskkontonr")
