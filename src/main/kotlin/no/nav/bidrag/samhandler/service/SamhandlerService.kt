@@ -1,6 +1,8 @@
 package no.nav.bidrag.samhandler.service
 
+import no.nav.bidrag.commons.security.utils.TokenUtils
 import no.nav.bidrag.domene.ident.Ident
+import no.nav.bidrag.samhandler.SECURE_LOGGER
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
@@ -52,6 +54,10 @@ class SamhandlerService(
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun opprettSamhandler(samhandlerDto: SamhandlerDto): Int {
         val samhandler = SamhandlerMapper.mapTilSamhandler(samhandlerDto)
+        SECURE_LOGGER.info(
+            "OpprettSamhandler for ${samhandlerDto.navn} utført av ${TokenUtils.hentSaksbehandlerIdent()
+                ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent"}.",
+        )
         return samhandlerRepository.save(samhandler).id
     }
 
@@ -95,6 +101,10 @@ class SamhandlerService(
                 notat = samhandlerDto.notat,
             )
         samhandlerRepository.save(oppdatertSamhandler)
+        SECURE_LOGGER.info(
+            "OppdaterSamhandler for ${samhandlerDto.samhandlerId} utført av ${TokenUtils.hentSaksbehandlerIdent()
+                ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent"}.",
+        )
         return ResponseEntity.ok().build<Any>()
     }
 }
