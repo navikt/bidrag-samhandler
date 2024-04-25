@@ -29,7 +29,7 @@ ibm:
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:${DB_URL}
+    url: jdbc:${NAIS_DATABASE_MYAPP_MYDB_URL}
     hikari:
       max-lifetime: 900000
       maximum-pool-size: 10
