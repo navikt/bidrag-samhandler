@@ -105,6 +105,7 @@ class SamhandlerService(
             "OppdaterSamhandler for ${samhandlerDto.samhandlerId} utført av ${TokenUtils.hentSaksbehandlerIdent()
                 ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent"}.",
         )
-        return ResponseEntity.ok().build<Any>()
+
+        return ResponseEntity.ok(SamhandlerMapper.mapTilSamhandlerDto(oppdatertSamhandler))
     }
 }
