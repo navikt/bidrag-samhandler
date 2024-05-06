@@ -47,7 +47,13 @@ class SamhandlerService(
     }
 
     fun samhandlerSøk(samhandlerSøk: SamhandlerSøk): SamhandlersøkeresultatDto {
+        SECURE_LOGGER.info(
+            "Samhandlersøk utført av {}. Input: {}",
+            TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
+            samhandlerSøk,
+        )
         val samhandlere = samhandlerRepository.findAll(SamhandlerSøkSpec.søkPåAlleParameter(samhandlerSøk))
+        SECURE_LOGGER.info("Samhandlersøk returnerte følgende samhandlere: {}", samhandlere.map { it.ident }.toString())
         return SamhandlerMapper.mapTilSamhandlersøkeresultatDto(samhandlere)
     }
 
