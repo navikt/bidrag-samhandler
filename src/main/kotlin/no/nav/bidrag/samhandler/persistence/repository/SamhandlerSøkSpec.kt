@@ -52,7 +52,7 @@ object SamhandlerSøkSpec {
                 criteriaBuilder.conjunction()
             } else {
                 criteriaBuilder.equal(
-                    criteriaBuilder.upper(root.get("offentlig_id")),
+                    criteriaBuilder.upper(root.get("offentligId")),
                     samhandlerSøk.offentligId!!.uppercase(),
                 )
             }
