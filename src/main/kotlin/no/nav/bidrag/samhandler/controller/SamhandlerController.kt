@@ -66,7 +66,9 @@ class SamhandlerController(
         description = "Søker etter samhandlere.",
         security = [SecurityRequirement(name = "bearer-key")],
     )
-    fun samhandlerSøk(samhandlerSøk: SamhandlerSøk): SamhandlersøkeresultatDto {
+    fun samhandlerSøk(
+        @RequestBody samhandlerSøk: SamhandlerSøk,
+    ): SamhandlersøkeresultatDto {
         return samhandlerService.samhandlerSøk(samhandlerSøk)
     }
 
