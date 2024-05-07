@@ -61,8 +61,10 @@ class SamhandlerService(
     fun opprettSamhandler(samhandlerDto: SamhandlerDto): Int {
         val samhandler = SamhandlerMapper.mapTilSamhandler(samhandlerDto)
         SECURE_LOGGER.info(
-            "OpprettSamhandler for ${samhandlerDto.navn} utført av ${TokenUtils.hentSaksbehandlerIdent()
-                ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent"}.",
+            "OpprettSamhandler for {} utført av {} med følgende data: {}",
+            samhandlerDto.navn,
+            TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
+            samhandlerDto,
         )
         return samhandlerRepository.save(samhandler).id
     }
@@ -108,8 +110,10 @@ class SamhandlerService(
             )
         samhandlerRepository.save(oppdatertSamhandler)
         SECURE_LOGGER.info(
-            "OppdaterSamhandler for ${samhandlerDto.samhandlerId} utført av ${TokenUtils.hentSaksbehandlerIdent()
-                ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent"}.",
+            "OppdaterSamhandler for {} utført av {} fra data: {}",
+            samhandlerDto.samhandlerId,
+            TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
+            samhandlerDto,
         )
 
         return ResponseEntity.ok(SamhandlerMapper.mapTilSamhandlerDto(oppdatertSamhandler))
