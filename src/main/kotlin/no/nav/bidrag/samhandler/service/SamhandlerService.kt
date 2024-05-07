@@ -90,6 +90,7 @@ class SamhandlerService(
                 offentligId = samhandlerDto.offentligId,
                 offentligIdType = samhandlerDto.offentligIdType,
                 områdekode = samhandlerDto.områdekode?.name,
+                språk = samhandlerDto.språk,
                 norskkontonr = samhandlerDto.kontonummer?.norskKontonummer,
                 iban = samhandlerDto.kontonummer?.iban,
                 swift = samhandlerDto.kontonummer?.swift,
