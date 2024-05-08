@@ -147,15 +147,28 @@ object SamhandlerMapper {
 
     fun mapTilSamhandlersøkeresultat(tssSamhandlerData: TssSamhandlerData): List<SamhandlerDto> {
         return tssSamhandlerData.tssOutputData.samhandlerODataB940.enkeltSamhandler
-            .map { mapSamhandler(it, Ident(tssSamhandlerData.tssInputData.tssServiceRutine.samhandlerIDataB910.idOffTSS)) }
+            .map {
+                mapSamhandler(
+                    it,
+                    tssSamhandlerData.tssInputData?.tssServiceRutine?.samhandlerIDataB910?.idOffTSS?.let {
+                            ident ->
+                        Ident(ident)
+                    },
+                )
+            }
     }
 
     private fun mapSamhandler(
         enkeltSamhandler: TypeKomp940,
-        ident: Ident,
+        ident: Ident?,
     ): SamhandlerDto {
         val samhandlerType = gyldigSamhandler(enkeltSamhandler.samhandler110, ident)
-        val avdeling = enkeltSamhandler.samhandlerAvd125.samhAvd.firstOrNull { avdeling -> avdeling.idOffTSS == ident.verdi }?.avdNr
+        val avdeling =
+            if (ident == null) {
+                enkeltSamhandler.samhandlerAvd125.samhAvd.firstOrNull()?.avdNr
+            } else {
+                enkeltSamhandler.samhandlerAvd125.samhAvd.firstOrNull { avdeling -> avdeling.idOffTSS == ident.verdi }?.avdNr
+            }
         return SamhandlerDto(
             samhandlerId = mapTilTssEksternId(enkeltSamhandler.samhandlerAvd125, avdeling),
             navn = samhandlerType?.navnSamh.trimToNull(),
@@ -176,14 +189,14 @@ object SamhandlerMapper {
 
     private fun gyldigSamhandler(
         samhandler110: TypeSamhandler?,
-        ident: Ident,
+        ident: Ident?,
     ): SamhandlerType? {
         var samhandlerType = samhandler110?.samhandler?.firstOrNull { it.kodeStatus == "GYLD" }
         if (samhandlerType == null) {
             LOGGER.warn(
                 "OPPHØRT SAMHANDLER: Samhandler med ident: {} har ingen gyldig statuskode! " +
                     "Benytter en ikke gyldig samhandler for data.",
-                ident.verdi,
+                ident?.verdi,
             )
             samhandlerType = samhandler110?.samhandler?.firstOrNull()
         }
