@@ -23,11 +23,10 @@ class TssService(
     @Cacheable("Samhandler")
     fun hentSamhandler(ident: Ident): SamhandlerDto? {
         val request = createTssSamhandlerRequest(ident)
-        val response: TssSamhandlerData =
-            mqService.performRequestResponseSpring(mqProperties.tssRequestQueue, request)
+        val response: TssSamhandlerData = mqService.performRequestResponseSpring(mqProperties.tssRequestQueue, request)
         validateResponse(response, ident)
 
-        return SamhandlerMapper.mapTilSamhandler(response)
+        return SamhandlerMapper.mapTilSamhandler(response, ident)
     }
 
     fun hentSamhandlerData(ident: Ident): TssSamhandlerData {
