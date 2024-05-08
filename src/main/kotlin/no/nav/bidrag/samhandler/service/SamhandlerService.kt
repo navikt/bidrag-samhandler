@@ -27,9 +27,11 @@ class SamhandlerService(
             return SamhandlerMapper.mapTilSamhandlerDto(samhandler)
         }
 
-        val hentSamhandler = tssService.hentSamhandler(ident)
-        hentSamhandler?.let { samhandlerRepository.save(SamhandlerMapper.mapTilSamhandler(hentSamhandler, true)) }
-        return hentSamhandler
+        val hentetSamhandler = tssService.hentSamhandler(ident)
+        hentetSamhandler?.let {
+            samhandlerRepository.save(SamhandlerMapper.mapTilSamhandler(hentetSamhandler.samhandlerDto, true, hentetSamhandler.erOpphørt))
+        }
+        return hentetSamhandler?.samhandlerDto
     }
 
     @Deprecated("Søker mot tss med gammel query.", replaceWith = ReplaceWith("samhandlerService.samhandlerSøk(samhandlerSøk)"))

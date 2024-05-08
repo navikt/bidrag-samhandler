@@ -64,6 +64,8 @@ data class Samhandler(
     val kontaktTelefon: String? = null,
     @Column(name = "notat")
     val notat: String? = null,
+    @Column(name = "er_opphort")
+    val erOpphørt: Boolean = false,
     @Version
     @Column(name = "endret_tidspunkt")
     var endretTidspunkt: LocalDateTime? = null,

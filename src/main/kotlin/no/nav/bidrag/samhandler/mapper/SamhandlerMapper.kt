@@ -5,6 +5,7 @@ import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.domene.ident.SamhandlerId
 import no.nav.bidrag.domene.land.Landkode3
 import no.nav.bidrag.samhandler.SECURE_LOGGER
+import no.nav.bidrag.samhandler.service.SamhandlerWrapper
 import no.nav.bidrag.transport.samhandler.AdresseDto
 import no.nav.bidrag.transport.samhandler.KontonummerDto
 import no.nav.bidrag.transport.samhandler.Områdekode
@@ -70,6 +71,7 @@ object SamhandlerMapper {
     fun mapTilSamhandler(
         samhandlerDto: SamhandlerDto,
         fraTss: Boolean = false,
+        erOpphørt: Boolean = false,
     ): no.nav.bidrag.samhandler.persistence.entity.Samhandler {
         return no.nav.bidrag.samhandler.persistence.entity.Samhandler(
             ident = if (fraTss) samhandlerDto.samhandlerId?.verdi else null,
@@ -95,43 +97,49 @@ object SamhandlerMapper {
             kontaktEpost = samhandlerDto.kontaktEpost,
             kontaktTelefon = samhandlerDto.kontaktTelefon,
             notat = samhandlerDto.notat,
+            erOpphørt = erOpphørt,
         )
     }
 
     fun mapTilSamhandler(
         tssSamhandlerData: TssSamhandlerData,
         ident: Ident,
-    ): SamhandlerDto? {
+    ): SamhandlerWrapper? {
         val samhandler = tssSamhandlerData.tssOutputData.samhandlerODataB910?.enkeltSamhandler?.firstOrNull()
 
-        return samhandler?.let {
-            val samhandlerType = gyldigSamhandler(it.samhandler110, ident)
-            val avdeling = it.samhandlerAvd125.samhAvd.firstOrNull { avdeling -> avdeling.idOffTSS == ident.verdi }?.avdNr
-            SamhandlerDto(
-                samhandlerId = mapTilTssEksternId(it.samhandlerAvd125, avdeling),
-                navn = samhandlerType?.navnSamh.trimToNull(),
-                offentligId = samhandlerType?.idOff.trimToNull(),
-                offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
-                språk = samhandlerType?.kodeSpraak,
-                områdekode = mapOmrådekode(samhandler),
-                adresse = mapTilAdresse(it.adresse130, avdeling),
-                kontonummer = mapToKontonummer(it, avdeling),
-                kontaktperson =
-                    samhandler.kontakter150?.enKontakt?.find {
-                            kontakt ->
-                        kontakt.kodeKontaktType == "KNTB" && avdeling == kontakt.avdNr
-                    }?.kontakt,
-                kontaktEpost =
-                    samhandler.kontakter150?.enKontakt?.find {
-                            kontakt ->
-                        kontakt.kodeKontaktType == "EPOS" && avdeling == kontakt.avdNr
-                    }?.kontakt,
-                kontaktTelefon =
-                    samhandler.kontakter150?.enKontakt?.find {
-                            kontakt ->
-                        kontakt.kodeKontaktType == "TLF" && avdeling == kontakt.avdNr
-                    }?.kontakt,
-            )
+        val samhandlerDto =
+            samhandler?.let {
+                val samhandlerType = gyldigSamhandler(it.samhandler110, ident)
+                val avdeling = it.samhandlerAvd125.samhAvd.firstOrNull { avdeling -> avdeling.idOffTSS == ident.verdi }?.avdNr
+                SamhandlerDto(
+                    samhandlerId = mapTilTssEksternId(it.samhandlerAvd125, avdeling),
+                    navn = samhandlerType?.navnSamh.trimToNull(),
+                    offentligId = samhandlerType?.idOff.trimToNull(),
+                    offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
+                    språk = samhandlerType?.kodeSpraak,
+                    områdekode = mapOmrådekode(samhandler),
+                    adresse = mapTilAdresse(it.adresse130, avdeling),
+                    kontonummer = mapToKontonummer(it, avdeling),
+                    kontaktperson =
+                        samhandler.kontakter150?.enKontakt?.find {
+                                kontakt ->
+                            kontakt.kodeKontaktType == "KNTB" && avdeling == kontakt.avdNr
+                        }?.kontakt,
+                    kontaktEpost =
+                        samhandler.kontakter150?.enKontakt?.find {
+                                kontakt ->
+                            kontakt.kodeKontaktType == "EPOS" && avdeling == kontakt.avdNr
+                        }?.kontakt,
+                    kontaktTelefon =
+                        samhandler.kontakter150?.enKontakt?.find {
+                                kontakt ->
+                            kontakt.kodeKontaktType == "TLF" && avdeling == kontakt.avdNr
+                        }?.kontakt,
+                )
+            }
+        val erOpphørt = samhandler?.samhandler110?.samhandler?.firstOrNull { it.kodeStatus == "GYLD" } == null
+        return samhandlerDto?.let {
+            SamhandlerWrapper(it, erOpphørt)
         }
     }
 
