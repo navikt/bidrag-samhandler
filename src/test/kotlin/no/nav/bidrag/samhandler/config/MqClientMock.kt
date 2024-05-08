@@ -44,7 +44,7 @@ class MqClientMock : MqClient(mockk(relaxed = true), mockk(), mockk()) {
                 samhAvd.add(
                     SamhAvdPraType().apply {
                         avdNr = "00"
-                        idOffTSS = "idOffTSS"
+                        idOffTSS = "80000000003"
                     },
                 )
             }
@@ -52,6 +52,8 @@ class MqClientMock : MqClient(mockk(relaxed = true), mockk(), mockk()) {
             TypeSamhAdr().apply {
                 adresseSamh.add(
                     AdresseSamhType().apply {
+                        avdNr = "00"
+                        gyldigAdresse = "J"
                         kodeLand = "kodeLand"
                         poststed = "poststed"
                         postNr = "postNr"
@@ -73,6 +75,7 @@ class MqClientMock : MqClient(mockk(relaxed = true), mockk(), mockk()) {
                     TypeSamhKonto().apply {
                         konto.add(
                             KontoType().apply {
+                                avdNr = "00"
                                 kodeLand = "kodeLand"
                                 bankNavn = "bankNavn"
                                 gironrInnland = "gironrInnland"

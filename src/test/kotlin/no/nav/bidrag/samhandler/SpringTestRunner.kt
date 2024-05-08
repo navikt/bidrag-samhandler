@@ -15,11 +15,12 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.context.ApplicationContext
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.util.UriComponentsBuilder
+import org.testcontainers.containers.PostgreSQLContainer
 
 @ActiveProfiles("test")
-// @ExtendWith(SpringExtension::class)
-// @ContextConfiguration(classes = [BidragSamhandlerLocal::class])
 @SpringBootTest(classes = [BidragSamhandlerLocal::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock
 @EnableMockOAuth2Server
@@ -86,5 +87,21 @@ class SpringTestRunner {
 
     companion object {
         private const val LOCALHOST = "http://localhost:"
+
+        private var postgreSqlDb =
+            PostgreSQLContainer("postgres:latest").apply {
+                withDatabaseName("bidrag-samhandler")
+                withUsername("cloudsqliamuser")
+                withPassword("admin")
+                start()
+            }
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun properties(registry: DynamicPropertyRegistry) {
+            registry.add("spring.datasource.url", postgreSqlDb::getJdbcUrl)
+            registry.add("spring.datasource.username", postgreSqlDb::getUsername)
+            registry.add("spring.datasource.password", postgreSqlDb::getPassword)
+        }
     }
 }

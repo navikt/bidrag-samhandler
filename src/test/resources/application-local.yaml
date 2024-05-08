@@ -14,3 +14,18 @@ ibm:
     password: passw0rd
     application-name: bidrag-samhandler
     tssRequestQueue: DEV.QUEUE.1
+
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:/db/migration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/default_database?user=cloudsqliamuser&password=samhandleradmin
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      data-source-properties:
+        ssl: false
+        sslmode: disable
+        sslcert: ""
+        sslkey: ""
+        sslrootcert: ""
