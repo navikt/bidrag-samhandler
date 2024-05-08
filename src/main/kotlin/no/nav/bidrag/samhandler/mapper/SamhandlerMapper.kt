@@ -4,6 +4,7 @@ import no.nav.bidrag.commons.util.trimToNull
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.domene.ident.SamhandlerId
 import no.nav.bidrag.domene.land.Landkode3
+import no.nav.bidrag.samhandler.SECURE_LOGGER
 import no.nav.bidrag.transport.samhandler.AdresseDto
 import no.nav.bidrag.transport.samhandler.KontonummerDto
 import no.nav.bidrag.transport.samhandler.Områdekode
@@ -16,9 +17,6 @@ import no.rtv.namespacetss.TypeKomp940
 import no.rtv.namespacetss.TypeSamhAdr
 import no.rtv.namespacetss.TypeSamhAvd
 import no.rtv.namespacetss.TypeSamhandler
-import org.slf4j.LoggerFactory
-
-private val LOGGER = LoggerFactory.getLogger(SamhandlerMapper::class.java)
 
 object SamhandlerMapper {
     fun mapTilSamhandlerDto(samhandler: no.nav.bidrag.samhandler.persistence.entity.Samhandler): SamhandlerDto {
@@ -193,7 +191,7 @@ object SamhandlerMapper {
     ): SamhandlerType? {
         var samhandlerType = samhandler110?.samhandler?.firstOrNull { it.kodeStatus == "GYLD" }
         if (samhandlerType == null) {
-            LOGGER.warn(
+            SECURE_LOGGER.warn(
                 "OPPHØRT SAMHANDLER: Samhandler med ident: {} har ingen gyldig statuskode! " +
                     "Benytter en ikke gyldig samhandler for data.",
                 ident?.verdi,
