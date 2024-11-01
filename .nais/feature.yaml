@@ -15,6 +15,9 @@ azure_access_inbound:
   - application: bidrag-sak-feature
     namespace: bidrag
     cluster: dev-fss
+  - application: bidrag-sak-q4
+    namespace: bidrag
+    cluster: dev-fss
   - application: bidrag-ui-feature
     namespace: bidrag
     cluster: dev-fss
@@ -24,3 +27,6 @@ azure_access_inbound:
   - application: bisys
     namespace: bidrag
     cluster: dev-fss
+  - application: bidrag-aktoerregister-q4
+    namespace: bidrag
+    cluser: dev-gcp
