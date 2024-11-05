@@ -57,9 +57,8 @@ class SamhandlerController(
         security = [SecurityRequirement(name = "bearer-key")],
     )
     @Deprecated(message = "Søk på samhandler mot TSS.", replaceWith = ReplaceWith("/samhandlersok"))
-    fun søkSamhandler(søkSamhandlerQuery: SøkSamhandlerQuery): SamhandlersøkeresultatDto {
-        return samhandlerService.søkSamhandler(søkSamhandlerQuery)
-    }
+    fun søkSamhandler(søkSamhandlerQuery: SøkSamhandlerQuery): SamhandlersøkeresultatDto =
+        samhandlerService.søkSamhandler(søkSamhandlerQuery)
 
     @PostMapping("/samhandlersok")
     @Operation(
@@ -68,9 +67,7 @@ class SamhandlerController(
     )
     fun samhandlerSøk(
         @RequestBody samhandlerSøk: SamhandlerSøk,
-    ): SamhandlersøkeresultatDto {
-        return samhandlerService.samhandlerSøk(samhandlerSøk)
-    }
+    ): SamhandlersøkeresultatDto = samhandlerService.samhandlerSøk(samhandlerSøk)
 
     @PostMapping("/opprettSamhandler")
     @Operation(
@@ -91,7 +88,5 @@ class SamhandlerController(
     )
     fun oppdaterSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
-    ): ResponseEntity<*> {
-        return samhandlerService.oppdaterSamhandler(samhandlerDto)
-    }
+    ): ResponseEntity<*> = samhandlerService.oppdaterSamhandler(samhandlerDto)
 }

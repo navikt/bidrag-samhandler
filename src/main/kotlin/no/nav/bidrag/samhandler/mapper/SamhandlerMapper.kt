@@ -5,7 +5,6 @@ import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.domene.ident.SamhandlerId
 import no.nav.bidrag.domene.land.Landkode3
 import no.nav.bidrag.samhandler.SECURE_LOGGER
-import no.nav.bidrag.samhandler.service.SamhandlerWrapper
 import no.nav.bidrag.transport.samhandler.AdresseDto
 import no.nav.bidrag.transport.samhandler.KontonummerDto
 import no.nav.bidrag.transport.samhandler.Områdekode
@@ -20,8 +19,8 @@ import no.rtv.namespacetss.TypeSamhAvd
 import no.rtv.namespacetss.TypeSamhandler
 
 object SamhandlerMapper {
-    fun mapTilSamhandlerDto(samhandler: no.nav.bidrag.samhandler.persistence.entity.Samhandler): SamhandlerDto {
-        return samhandler.let {
+    fun mapTilSamhandlerDto(samhandler: no.nav.bidrag.samhandler.persistence.entity.Samhandler): SamhandlerDto =
+        samhandler.let {
             SamhandlerDto(
                 samhandlerId = it.ident?.let { ident -> SamhandlerId(ident) },
                 navn = it.navn,
@@ -54,26 +53,24 @@ object SamhandlerMapper {
                 notat = it.notat,
             )
         }
-    }
 
     fun mapTilSamhandlersøkeresultatDto(
         samhandlere: List<no.nav.bidrag.samhandler.persistence.entity.Samhandler>,
-    ): SamhandlersøkeresultatDto {
-        return SamhandlersøkeresultatDto(
+    ): SamhandlersøkeresultatDto =
+        SamhandlersøkeresultatDto(
             samhandlere =
                 samhandlere.map {
                     mapTilSamhandlerDto(it)
                 },
             flereForekomster = samhandlere.size >= 2,
         )
-    }
 
     fun mapTilSamhandler(
         samhandlerDto: SamhandlerDto,
         fraTss: Boolean = false,
         erOpphørt: Boolean = false,
-    ): no.nav.bidrag.samhandler.persistence.entity.Samhandler {
-        return no.nav.bidrag.samhandler.persistence.entity.Samhandler(
+    ): no.nav.bidrag.samhandler.persistence.entity.Samhandler =
+        no.nav.bidrag.samhandler.persistence.entity.Samhandler(
             ident = if (fraTss) samhandlerDto.samhandlerId?.verdi else null,
             navn = samhandlerDto.navn ?: if (fraTss) "" else error("Samhandler kan ikke opprettes uten navn."),
             offentligId = samhandlerDto.offentligId,
@@ -99,70 +96,74 @@ object SamhandlerMapper {
             notat = samhandlerDto.notat,
             erOpphørt = erOpphørt,
         )
-    }
 
-    fun mapTilSamhandler(
+    fun mapTilSamhandlerDto(
         tssSamhandlerData: TssSamhandlerData,
         ident: Ident,
-    ): SamhandlerWrapper? {
-        val samhandler = tssSamhandlerData.tssOutputData.samhandlerODataB910?.enkeltSamhandler?.firstOrNull()
+    ): SamhandlerDto? {
+        val samhandler =
+            tssSamhandlerData.tssOutputData.samhandlerODataB910
+                ?.enkeltSamhandler
+                ?.firstOrNull()
 
-        val samhandlerDto =
-            samhandler?.let {
-                val samhandlerType = gyldigSamhandler(it.samhandler110, ident)
-                val avdeling = it.samhandlerAvd125.samhAvd.firstOrNull { avdeling -> avdeling.idOffTSS == ident.verdi }?.avdNr
-                SamhandlerDto(
-                    samhandlerId = mapTilTssEksternId(it.samhandlerAvd125, avdeling),
-                    navn = samhandlerType?.navnSamh.trimToNull(),
-                    offentligId = samhandlerType?.idOff.trimToNull(),
-                    offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
-                    språk = samhandlerType?.kodeSpraak,
-                    områdekode = mapOmrådekode(samhandler),
-                    adresse = mapTilAdresse(it.adresse130, avdeling),
-                    kontonummer = mapToKontonummer(it, avdeling),
-                    kontaktperson =
-                        samhandler.kontakter150?.enKontakt?.find {
-                                kontakt ->
+        return samhandler?.let {
+            val samhandlerType = gyldigSamhandler(it.samhandler110, ident)
+            val avdeling =
+                it.samhandlerAvd125.samhAvd
+                    .firstOrNull { avdeling -> avdeling.idOffTSS == ident.verdi }
+                    ?.avdNr
+            SamhandlerDto(
+                samhandlerId = mapTilTssEksternId(it.samhandlerAvd125, avdeling),
+                navn = samhandlerType?.navnSamh.trimToNull(),
+                offentligId = samhandlerType?.idOff.trimToNull(),
+                offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
+                språk = samhandlerType?.kodeSpraak,
+                områdekode = mapOmrådekode(samhandler),
+                adresse = mapTilAdresse(it.adresse130, avdeling),
+                kontonummer = mapToKontonummer(it, avdeling),
+                kontaktperson =
+                    samhandler.kontakter150
+                        ?.enKontakt
+                        ?.find { kontakt ->
                             kontakt.kodeKontaktType == "KNTB" && avdeling == kontakt.avdNr
                         }?.kontakt,
-                    kontaktEpost =
-                        samhandler.kontakter150?.enKontakt?.find {
-                                kontakt ->
+                kontaktEpost =
+                    samhandler.kontakter150
+                        ?.enKontakt
+                        ?.find { kontakt ->
                             kontakt.kodeKontaktType == "EPOS" && avdeling == kontakt.avdNr
                         }?.kontakt,
-                    kontaktTelefon =
-                        samhandler.kontakter150?.enKontakt?.find {
-                                kontakt ->
+                kontaktTelefon =
+                    samhandler.kontakter150
+                        ?.enKontakt
+                        ?.find { kontakt ->
                             kontakt.kodeKontaktType == "TLF" && avdeling == kontakt.avdNr
                         }?.kontakt,
-                )
-            }
-        val erOpphørt = samhandler?.samhandler110?.samhandler?.firstOrNull { it.kodeStatus == "GYLD" } == null
-        return samhandlerDto?.let {
-            SamhandlerWrapper(it, erOpphørt)
+                erOpphørt = samhandler.samhandler110?.samhandler?.firstOrNull { it.kodeStatus == "GYLD" } == null,
+            )
         }
     }
 
     private fun mapOmrådekode(samhandler: Samhandler) =
         Områdekode.entries.find { områdekode ->
             områdekode.tssOmrådekode ==
-                samhandler.samhandlerFag120?.samhFag?.find { samfag ->
-                    samfag.gyldigFag == "J"
-                }?.kodeFagOmrade
+                samhandler.samhandlerFag120
+                    ?.samhFag
+                    ?.find { samfag ->
+                        samfag.gyldigFag == "J"
+                    }?.kodeFagOmrade
         }
 
-    fun mapTilSamhandlersøkeresultat(tssSamhandlerData: TssSamhandlerData): List<SamhandlerDto> {
-        return tssSamhandlerData.tssOutputData.samhandlerODataB940.enkeltSamhandler
+    fun mapTilSamhandlersøkeresultat(tssSamhandlerData: TssSamhandlerData): List<SamhandlerDto> =
+        tssSamhandlerData.tssOutputData.samhandlerODataB940.enkeltSamhandler
             .map {
                 mapSamhandler(
                     it,
-                    tssSamhandlerData.tssInputData?.tssServiceRutine?.samhandlerIDataB910?.idOffTSS?.let {
-                            ident ->
+                    tssSamhandlerData.tssInputData?.tssServiceRutine?.samhandlerIDataB910?.idOffTSS?.let { ident ->
                         Ident(ident)
                     },
                 )
             }
-    }
 
     private fun mapSamhandler(
         enkeltSamhandler: TypeKomp940,
@@ -171,9 +172,13 @@ object SamhandlerMapper {
         val samhandlerType = gyldigSamhandler(enkeltSamhandler.samhandler110, ident)
         val avdeling =
             if (ident == null) {
-                enkeltSamhandler.samhandlerAvd125.samhAvd.firstOrNull()?.avdNr
+                enkeltSamhandler.samhandlerAvd125.samhAvd
+                    .firstOrNull()
+                    ?.avdNr
             } else {
-                enkeltSamhandler.samhandlerAvd125.samhAvd.firstOrNull { avdeling -> avdeling.idOffTSS == ident.verdi }?.avdNr
+                enkeltSamhandler.samhandlerAvd125.samhAvd
+                    .firstOrNull { avdeling -> avdeling.idOffTSS == ident.verdi }
+                    ?.avdNr
             }
         return SamhandlerDto(
             samhandlerId = mapTilTssEksternId(enkeltSamhandler.samhandlerAvd125, avdeling),
@@ -188,9 +193,10 @@ object SamhandlerMapper {
         samhandlerAvd125: TypeSamhAvd,
         avdeling: String?,
     ) = SamhandlerId(
-        samhandlerAvd125.samhAvd.first {
-            it.avdNr == avdeling
-        }.idOffTSS,
+        samhandlerAvd125.samhAvd
+            .first {
+                it.avdNr == avdeling
+            }.idOffTSS,
     )
 
     private fun gyldigSamhandler(
@@ -217,9 +223,21 @@ object SamhandlerMapper {
             land = it.kodeLand?.trimToNull()?.let { s -> Landkode3(s) },
             poststed = it.poststed?.trimToNull(),
             postnr = it.postNr?.trimToNull(),
-            adresselinje1 = it.adrLinjeInfo?.adresseLinje?.firstOrNull()?.trimToNull(),
-            adresselinje2 = it.adrLinjeInfo?.adresseLinje?.getOrNull(1)?.trimToNull(),
-            adresselinje3 = it.adrLinjeInfo?.adresseLinje?.getOrNull(2)?.trimToNull(),
+            adresselinje1 =
+                it.adrLinjeInfo
+                    ?.adresseLinje
+                    ?.firstOrNull()
+                    ?.trimToNull(),
+            adresselinje2 =
+                it.adrLinjeInfo
+                    ?.adresseLinje
+                    ?.getOrNull(1)
+                    ?.trimToNull(),
+            adresselinje3 =
+                it.adrLinjeInfo
+                    ?.adresseLinje
+                    ?.getOrNull(2)
+                    ?.trimToNull(),
         )
     }
 
@@ -227,8 +245,10 @@ object SamhandlerMapper {
         samhandler: Samhandler,
         avdeling: String?,
     ): KontonummerDto? {
-        val kontoTypeInnland = samhandler.konto140?.konto?.firstOrNull { it.gironrInnland != null && avdeling == it.avdNr }
-        val kontoTypeUtland = samhandler.konto140?.konto?.firstOrNull { it.gironrUtland != null && avdeling == it.avdNr }
+        val kontoTypeInnland =
+            samhandler.konto140?.konto?.firstOrNull { it.gironrInnland != null && avdeling == it.avdNr }
+        val kontoTypeUtland =
+            samhandler.konto140?.konto?.firstOrNull { it.gironrUtland != null && avdeling == it.avdNr }
 
         return (kontoTypeInnland ?: kontoTypeUtland)?.let {
             KontonummerDto(

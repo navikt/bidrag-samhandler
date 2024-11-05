@@ -17,12 +17,13 @@ class TssController(
 ) {
     @PostMapping("/samhandlerData")
     @Operation(
-        description = "Henter samhandler for ident og lever ut all data på identen slik det hentes fra TSS",
+        description =
+            "Henter samhandler for ident og lever ut all data på identen slik det hentes fra TSS." +
+                "Denne tjenesten lagrer IKKE i databasen.",
         security = [SecurityRequirement(name = "bearer-key")],
     )
+    @Deprecated(message = "Bruk hentSamhandler i stedet", replaceWith = ReplaceWith("/samhandler"))
     fun hentSamhandlerData(
         @RequestBody ident: Ident,
-    ): TssSamhandlerData {
-        return tssService.hentSamhandlerData(ident)
-    }
+    ): TssSamhandlerData = tssService.hentSamhandlerData(ident)
 }

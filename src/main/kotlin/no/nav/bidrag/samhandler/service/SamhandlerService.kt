@@ -29,9 +29,9 @@ class SamhandlerService(
 
         val hentetSamhandler = tssService.hentSamhandler(ident)
         hentetSamhandler?.let {
-            samhandlerRepository.save(SamhandlerMapper.mapTilSamhandler(hentetSamhandler.samhandlerDto, true, hentetSamhandler.erOpphørt))
+            samhandlerRepository.save(SamhandlerMapper.mapTilSamhandler(hentetSamhandler, true, hentetSamhandler.erOpphørt))
         }
-        return hentetSamhandler?.samhandlerDto
+        return hentetSamhandler
     }
 
     @Deprecated("Søker mot tss med gammel query.", replaceWith = ReplaceWith("samhandlerService.samhandlerSøk(samhandlerSøk)"))
@@ -80,14 +80,16 @@ class SamhandlerService(
     @Transactional
     fun oppdaterSamhandler(samhandlerDto: SamhandlerDto): ResponseEntity<*> {
         val samhandlerIdent =
-            samhandlerDto.samhandlerId?.verdi ?: return ResponseEntity.badRequest()
+            samhandlerDto.samhandlerId?.verdi ?: return ResponseEntity
+                .badRequest()
                 .body("Oppdatering av samhandler må ha angitt samhandlerId!")
         val samhandler = samhandlerRepository.findByIdent(samhandlerIdent) ?: return ResponseEntity.notFound().build<Any>()
 
         val oppdatertSamhandler =
             samhandler.copy(
                 navn =
-                    samhandlerDto.navn ?: return ResponseEntity.badRequest()
+                    samhandlerDto.navn ?: return ResponseEntity
+                        .badRequest()
                         .body("Navn kan ikke være tomt! Mangler navn fra TSS må dette opprettes."),
                 offentligId = samhandlerDto.offentligId,
                 offentligIdType = samhandlerDto.offentligIdType,
@@ -111,6 +113,7 @@ class SamhandlerService(
                 kontaktTelefon = samhandlerDto.kontaktTelefon,
                 notat = samhandlerDto.notat,
             )
+
         samhandlerRepository.save(oppdatertSamhandler)
         SECURE_LOGGER.info(
             "OppdaterSamhandler for {} utført av {} fra data: {}",

@@ -8,6 +8,7 @@ import no.nav.bidrag.samhandler.integration.MqClient
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.mapper.TssRequestMapper.createSamhandlersøkRequest
 import no.nav.bidrag.samhandler.mapper.TssRequestMapper.createTssSamhandlerRequest
+import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import no.rtv.namespacetss.TssSamhandlerData
@@ -20,12 +21,12 @@ class TssService(
     private val mqProperties: MQProperties,
 ) {
     @Cacheable("Samhandler")
-    fun hentSamhandler(ident: Ident): SamhandlerWrapper? {
+    fun hentSamhandler(ident: Ident): SamhandlerDto? {
         val request = createTssSamhandlerRequest(ident)
         val response: TssSamhandlerData = mqService.performRequestResponseSpring(mqProperties.tssRequestQueue, request)
         validateResponse(response, ident)
 
-        return SamhandlerMapper.mapTilSamhandler(response, ident)
+        return SamhandlerMapper.mapTilSamhandlerDto(response, ident)
     }
 
     fun hentSamhandlerData(ident: Ident): TssSamhandlerData {

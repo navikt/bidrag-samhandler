@@ -5,8 +5,8 @@ import no.nav.bidrag.transport.samhandler.SamhandlerSøk
 import org.springframework.data.jpa.domain.Specification
 
 object SamhandlerSøkSpec {
-    fun søkPåAlleParameter(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification
+    fun søkPåAlleParameter(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification
             .where(navnLike(samhandlerSøk))
             .and(identEquals(samhandlerSøk))
             .and(offentligIdEquals(samhandlerSøk))
@@ -18,10 +18,9 @@ object SamhandlerSøkSpec {
             .and(banknavnEquals(samhandlerSøk))
             .and(banklandkodeEquals(samhandlerSøk))
             .and(bankcodeEquals(samhandlerSøk))
-    }
 
-    private fun navnLike(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification<Samhandler> { root, _, criteriaBuilder ->
+    private fun navnLike(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.navn.isNullOrEmpty()) {
                 criteriaBuilder.conjunction()
             } else {
@@ -31,10 +30,9 @@ object SamhandlerSøkSpec {
                 )
             }
         }
-    }
 
-    private fun identEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification<Samhandler> { root, _, criteriaBuilder ->
+    private fun identEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.ident.isNullOrEmpty()) {
                 criteriaBuilder.conjunction()
             } else {
@@ -44,10 +42,9 @@ object SamhandlerSøkSpec {
                 )
             }
         }
-    }
 
-    private fun offentligIdEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification<Samhandler> { root, _, criteriaBuilder ->
+    private fun offentligIdEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.offentligId.isNullOrEmpty()) {
                 criteriaBuilder.conjunction()
             } else {
@@ -57,10 +54,9 @@ object SamhandlerSøkSpec {
                 )
             }
         }
-    }
 
-    private fun postnummerEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification<Samhandler> { root, _, criteriaBuilder ->
+    private fun postnummerEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.postnummer.isNullOrEmpty()) {
                 criteriaBuilder.conjunction()
             } else {
@@ -70,10 +66,9 @@ object SamhandlerSøkSpec {
                 )
             }
         }
-    }
 
-    private fun poststedEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification<Samhandler> { root, _, criteriaBuilder ->
+    private fun poststedEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.poststed.isNullOrEmpty()) {
                 criteriaBuilder.conjunction()
             } else {
@@ -83,10 +78,9 @@ object SamhandlerSøkSpec {
                 )
             }
         }
-    }
 
-    private fun kontonummerEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification<Samhandler> { root, _, criteriaBuilder ->
+    private fun kontonummerEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.norskkontonr.isNullOrEmpty()) {
                 criteriaBuilder.conjunction()
             } else {
@@ -96,10 +90,9 @@ object SamhandlerSøkSpec {
                 )
             }
         }
-    }
 
-    private fun ibanEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification<Samhandler> { root, _, criteriaBuilder ->
+    private fun ibanEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.iban.isNullOrEmpty()) {
                 criteriaBuilder.conjunction()
             } else {
@@ -109,10 +102,9 @@ object SamhandlerSøkSpec {
                 )
             }
         }
-    }
 
-    private fun swiftEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification<Samhandler> { root, _, criteriaBuilder ->
+    private fun swiftEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.swift.isNullOrEmpty()) {
                 criteriaBuilder.conjunction()
             } else {
@@ -122,10 +114,9 @@ object SamhandlerSøkSpec {
                 )
             }
         }
-    }
 
-    private fun banknavnEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification<Samhandler> { root, _, criteriaBuilder ->
+    private fun banknavnEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.banknavn.isNullOrEmpty()) {
                 criteriaBuilder.conjunction()
             } else {
@@ -135,10 +126,9 @@ object SamhandlerSøkSpec {
                 )
             }
         }
-    }
 
-    private fun banklandkodeEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification<Samhandler> { root, _, criteriaBuilder ->
+    private fun banklandkodeEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.banklandkode.isNullOrEmpty()) {
                 criteriaBuilder.conjunction()
             } else {
@@ -148,10 +138,9 @@ object SamhandlerSøkSpec {
                 )
             }
         }
-    }
 
-    private fun bankcodeEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> {
-        return Specification<Samhandler> { root, _, criteriaBuilder ->
+    private fun bankcodeEquals(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
             if (samhandlerSøk.bankcode.isNullOrEmpty()) {
                 criteriaBuilder.conjunction()
             } else {
@@ -161,5 +150,4 @@ object SamhandlerSøkSpec {
                 )
             }
         }
-    }
 }
