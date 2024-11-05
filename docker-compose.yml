@@ -1,4 +1,3 @@
-version: '2'
 services:
   database:
     image: postgres:latest
@@ -8,3 +7,12 @@ services:
       POSTGRES_USER: cloudsqliamuser
       POSTGRES_PASSWORD: samhandleradmin
       POSTGRES_DB: default_database
+
+  mq:
+    image: ibmcom/mq
+    ports:
+      - "1414:1414"
+    environment:
+      - LICENSE=accept
+      - MQ_QMGR_NAME=QM1
+      - MQ_ADMIN_PASSWORD=passw0rd
