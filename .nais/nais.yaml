@@ -41,17 +41,23 @@ spec:
     path: /actuator/prometheus
   resources:
     limits:
-      cpu: 1000m
-      memory: 2048Mi
+      cpu: {{limits.cpu}}
+      memory: {{limits.memory}}
     requests:
-      cpu: 500m
-      memory: 1024Mi
+      cpu: {{requests.cpu}}
+      memory: {{requests.memory}}
+  replicas:
+    disableAutoScaling: true
+    max: {{replicas.max}}
+    min: {{replicas.min}}
   envFrom:
     - secret: bidrag-samhandler-mq-password
   gcp:
     sqlInstances:
       - name: {{ database.navn }}
         type: POSTGRES_15
+        diskSize: {{ database.size }}
+        tier: {{ database.tier }}
         databases:
           - name: bidrag-samhandler
             envVarPrefix: DB

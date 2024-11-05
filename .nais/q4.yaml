@@ -1,8 +1,19 @@
-name: bidrag-samhandler
+name: bidrag-samhandler-q4
 ingresses:
-  - https://bidrag-samhandler.intern.dev.nav.no
+  - https://bidrag-samhandler-q4.intern.dev.nav.no
+limits:
+  cpu: 500m
+  memory: 1012Mi
+requests:
+  cpu: 250m
+  memory: 512Mi
+replicas:
+  max: 1
+  min: 1
 database:
-  navn: bidrag-samhandler-main
+  navn: bidrag-samhandler-q4
+  tier: db-f1-micro
+  size: 10
 env:
   MQ_CONN_NAME: b27apvl220.preprod.local(1413)
   MQ_HOST: b27apvl220.preprod.local
@@ -12,27 +23,15 @@ env:
   MQ_TSS_REQUEST_QUEUE: queue:///QA.Q1_415.AS10_SAMHANDLER_SERVICE?targetClient=1
   JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
 azure_access_inbound:
-  - application: bidrag-sak
+  - application: bidrag-sak-q4
     namespace: bidrag
     cluster: dev-fss
-  - application: bidrag-sak-q1
+  - application: bidrag-ui-q4
     namespace: bidrag
     cluster: dev-fss
-  - application: bidrag-sak-q2
-    namespace: bidrag
-    cluster: dev-fss
-  - application: bidrag-ui
-    namespace: bidrag
-    cluster: dev-fss
-  - application: bidrag-aktoerregister
+  - application: bidrag-aktoerregister-q4
     namespace: bidrag
     cluser: dev-gcp
   - application: bisys
     namespace: bidrag
     cluster: dev-fss
-  - application: bidrag-aktoerregister-q1
-    namespace: bidrag
-    cluser: dev-gcp
-  - application: bidrag-aktoerregister-q2
-    namespace: bidrag
-    cluser: dev-gcp

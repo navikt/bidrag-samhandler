@@ -1,8 +1,19 @@
 name: bidrag-samhandler
 ingresses:
   - https://bidrag-samhandler.intern.nav.no
+limits:
+  cpu: 1000m
+  memory: 2048Mi
+requests:
+  cpu: 500m
+  memory: 1012Mi
+replicas:
+  max: 2
+  min: 2
 database:
   navn: bidrag-samhandler-prod
+  tier: db-custom-1-3840
+  size: 25
 env:
   MQ_CONN_NAME: mpls02.adeo.no(1414)
   MQ_HOST: mpls02.adeo.no
