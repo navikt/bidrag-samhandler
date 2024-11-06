@@ -27,6 +27,7 @@
 		<mockk.version>1.13.12</mockk.version>
 		<kotlin-logging-jvm.version>6.0.9</kotlin-logging-jvm.version>
 		<ktlint.version>1.2.1</ktlint.version>
+		<hypersistence-utils-hibernate.version>3.8.3</hypersistence-utils-hibernate.version>
 	</properties>
 
 	<repositories>
@@ -228,6 +229,11 @@
 			<artifactId>micrometer-registry-prometheus</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.hypersistence</groupId>
+			<artifactId>hypersistence-utils-hibernate-63</artifactId>
+			<version>${hypersistence-utils-hibernate.version}</version>
+		</dependency>
 
 		<!--Test-->
 		<dependency>
@@ -293,6 +299,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
 
 	<build>
 		<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
