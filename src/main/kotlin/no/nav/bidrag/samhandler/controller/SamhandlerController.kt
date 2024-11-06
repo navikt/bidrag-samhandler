@@ -46,8 +46,9 @@ class SamhandlerController(
     )
     fun hentSamhandler(
         @RequestBody ident: Ident,
+        inkluderAuditLog: Boolean = false,
     ): ResponseEntity<*> {
-        val samhandler = samhandlerService.hentSamhandler(ident) ?: return ResponseEntity.notFound().build<Any>()
+        val samhandler = samhandlerService.hentSamhandler(ident, inkluderAuditLog) ?: return ResponseEntity.notFound().build<Any>()
         return ResponseEntity.ok(samhandler)
     }
 

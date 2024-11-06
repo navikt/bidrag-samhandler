@@ -21,10 +21,13 @@ class SamhandlerService(
     private val tssService: TssService,
     private val samhandlerRepository: SamhandlerRepository,
 ) {
-    fun hentSamhandler(ident: Ident): SamhandlerDto? {
+    fun hentSamhandler(
+        ident: Ident,
+        inkluderAuditLog: Boolean,
+    ): SamhandlerDto? {
         val samhandler = samhandlerRepository.findByIdent(ident.verdi)
         if (samhandler != null) {
-            return SamhandlerMapper.mapTilSamhandlerDto(samhandler)
+            return SamhandlerMapper.mapTilSamhandlerDto(samhandler, inkluderAuditLog)
         }
 
         val hentetSamhandler = tssService.hentSamhandler(ident)

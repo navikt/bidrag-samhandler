@@ -26,9 +26,10 @@ CREATE TABLE IF NOT EXISTS samhandlere
     kontakt_epost       text,
     kontakt_telefon     text,
     notat               text,
+    er_opphort          boolean DEFAULT false,
     endret_tidspunkt    timestamp,
     opprettet_tidspunkt timestamp DEFAULT current_timestamp
 );
 
-CREATE INDEX navn_index ON samhandlere (navn);
-CREATE INDEX ident_index ON samhandlere (ident);
+CREATE INDEX IF NOT EXISTS navn_index ON samhandlere (navn);
+CREATE INDEX IF NOT EXISTS ident_index ON samhandlere (ident);

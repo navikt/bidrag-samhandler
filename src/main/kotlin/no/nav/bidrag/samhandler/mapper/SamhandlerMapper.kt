@@ -19,7 +19,10 @@ import no.rtv.namespacetss.TypeSamhAvd
 import no.rtv.namespacetss.TypeSamhandler
 
 object SamhandlerMapper {
-    fun mapTilSamhandlerDto(samhandler: no.nav.bidrag.samhandler.persistence.entity.Samhandler): SamhandlerDto =
+    fun mapTilSamhandlerDto(
+        samhandler: no.nav.bidrag.samhandler.persistence.entity.Samhandler,
+        inkluderAuditLog: Boolean = false,
+    ): SamhandlerDto =
         samhandler.let {
             SamhandlerDto(
                 samhandlerId = it.ident?.let { ident -> SamhandlerId(ident) },
@@ -51,6 +54,15 @@ object SamhandlerMapper {
                 kontaktEpost = it.kontaktEpost,
                 kontaktTelefon = it.kontaktTelefon,
                 notat = it.notat,
+                erOpphørt = it.erOpphørt,
+                auditLog =
+                    if (inkluderAuditLog) {
+                        it.auditLog.map { auditLog ->
+                            AuditLogMapper.mapTilAuditLogDto(auditLog)
+                        }
+                    } else {
+                        emptyList()
+                    },
             )
         }
 
