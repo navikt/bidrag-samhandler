@@ -4,15 +4,15 @@ import no.nav.bidrag.commons.security.utils.TokenUtils
 import no.nav.bidrag.commons.web.MdcConstants
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.samhandler.SECURE_LOGGER
-import no.nav.bidrag.samhandler.kafka.SamhandlerKafkaHendelsestype
-import no.nav.bidrag.samhandler.kafka.SamhandlerMelding
 import no.nav.bidrag.samhandler.kafka.SamhandlerProducer
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.persistence.entity.Samhandler
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
+import no.nav.bidrag.transport.samhandler.SamhandlerKafkaHendelsestype
 import no.nav.bidrag.transport.samhandler.SamhandlerSøk
+import no.nav.bidrag.transport.samhandler.Samhandlerhendelse
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import org.springframework.http.ResponseEntity
@@ -154,12 +154,12 @@ class SamhandlerService(
         samhandler: Samhandler,
         hendelsestype: SamhandlerKafkaHendelsestype,
     ) {
-        val samhandlerMelding =
-            SamhandlerMelding(
+        val samhandlerhendelse =
+            Samhandlerhendelse(
                 samhandler.ident!!,
                 hendelsestype,
                 MdcConstants.MDC_CALL_ID,
             )
-        samhandlerProducer.sendSamhandlerMelding(samhandlerMelding)
+        samhandlerProducer.sendSamhandlerMelding(samhandlerhendelse)
     }
 }

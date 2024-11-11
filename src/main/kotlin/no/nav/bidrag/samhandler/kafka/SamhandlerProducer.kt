@@ -2,6 +2,7 @@ package no.nav.bidrag.samhandler.kafka
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.bidrag.samhandler.config.KafkaConfig
+import no.nav.bidrag.transport.samhandler.Samhandlerhendelse
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.retry.annotation.Backoff
@@ -21,40 +22,28 @@ class SamhandlerProducer(
         maxAttempts = 10,
         backoff = Backoff(delay = 1000, maxDelay = 12000, multiplier = 2.0),
     )
-    fun sendSamhandlerMelding(samhandlerMelding: SamhandlerMelding) {
-        sendKafkamelding(kafkaConfig.topicSamhandler, samhandlerMelding)
+    fun sendSamhandlerMelding(samhandlerhendelse: Samhandlerhendelse) {
+        sendKafkamelding(kafkaConfig.topicSamhandler, samhandlerhendelse)
     }
 
     private fun sendKafkamelding(
         topic: String,
-        samhandlerMelding: SamhandlerMelding,
+        samhandlerhendelse: Samhandlerhendelse,
     ) {
-        val melding = objectMapper.writeValueAsString(samhandlerMelding)
+        val melding = objectMapper.writeValueAsString(samhandlerhendelse)
         kafkaTemplate
-            .send(topic, samhandlerMelding.samhandlerId, melding)
+            .send(topic, samhandlerhendelse.samhandlerId, melding)
             .thenAccept {
                 logger.info(
-                    "Melding på topic $topic for samhandlerId ${samhandlerMelding.samhandlerId} er sendt. " +
+                    "Melding på topic $topic for samhandlerId ${samhandlerhendelse.samhandlerId} er sendt. " +
                         "Fikk offset ${it?.recordMetadata?.offset()}",
                 )
             }.exceptionally {
                 val feilmelding =
-                    "Melding på topic $topic kan ikke sendes for samhandlerId ${samhandlerMelding.samhandlerId}. " +
+                    "Melding på topic $topic kan ikke sendes for samhandlerId ${samhandlerhendelse.samhandlerId}. " +
                         "Feiler med ${it.message}"
                 logger.warn(feilmelding)
                 error(feilmelding)
             }
     }
-}
-
-data class SamhandlerMelding(
-    val samhandlerId: String,
-    val hendelsestype: SamhandlerKafkaHendelsestype,
-    val sporingId: String,
-)
-
-enum class SamhandlerKafkaHendelsestype {
-    OPPRETTET,
-    OPPDATERT,
-    OPPHØRT,
 }
