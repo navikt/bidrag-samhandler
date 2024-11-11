@@ -1,9 +1,14 @@
 package no.nav.bidrag.samhandler.service
 
 import no.nav.bidrag.commons.security.utils.TokenUtils
+import no.nav.bidrag.commons.web.MdcConstants
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.samhandler.SECURE_LOGGER
+import no.nav.bidrag.samhandler.kafka.SamhandlerKafkaHendelsestype
+import no.nav.bidrag.samhandler.kafka.SamhandlerMelding
+import no.nav.bidrag.samhandler.kafka.SamhandlerProducer
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
+import no.nav.bidrag.samhandler.persistence.entity.Samhandler
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
@@ -20,6 +25,7 @@ import kotlin.jvm.optionals.getOrNull
 class SamhandlerService(
     private val tssService: TssService,
     private val samhandlerRepository: SamhandlerRepository,
+    private val samhandlerProducer: SamhandlerProducer,
 ) {
     fun hentSamhandler(
         ident: Ident,
@@ -32,16 +38,24 @@ class SamhandlerService(
 
         val hentetSamhandler = tssService.hentSamhandler(ident)
         hentetSamhandler?.let {
-            samhandlerRepository.save(SamhandlerMapper.mapTilSamhandler(hentetSamhandler, true, hentetSamhandler.erOpphørt))
+            val mapTilSamhandler = SamhandlerMapper.mapTilSamhandler(hentetSamhandler, true, hentetSamhandler.erOpphørt)
+            val opprettetSamhandler = samhandlerRepository.save(mapTilSamhandler)
+            sendKafkamelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
         }
         return hentetSamhandler
     }
 
-    @Deprecated("Søker mot tss med gammel query.", replaceWith = ReplaceWith("samhandlerService.samhandlerSøk(samhandlerSøk)"))
+    @Deprecated(
+        "Søker mot tss med gammel query.",
+        replaceWith = ReplaceWith("samhandlerService.samhandlerSøk(samhandlerSøk)"),
+    )
     fun søkSamhandler(søkSamhandlerQuery: SøkSamhandlerQuery): SamhandlersøkeresultatDto {
         val samhandlere =
             søkSamhandlerQuery.postnummer?.let {
-                samhandlerRepository.findAllByNavnIgnoreCaseAndPostnr(søkSamhandlerQuery.navn, søkSamhandlerQuery.postnummer)
+                samhandlerRepository.findAllByNavnIgnoreCaseAndPostnr(
+                    søkSamhandlerQuery.navn,
+                    søkSamhandlerQuery.postnummer,
+                )
             }
                 ?: samhandlerRepository.findAllByNavnIgnoreCase(søkSamhandlerQuery.navn)
 
@@ -71,7 +85,11 @@ class SamhandlerService(
             TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
             samhandlerDto,
         )
-        return samhandlerRepository.save(samhandler).id
+        val opprettetSamhandler = samhandlerRepository.save(samhandler)
+
+        sendKafkamelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
+
+        return opprettetSamhandler.id
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -86,7 +104,8 @@ class SamhandlerService(
             samhandlerDto.samhandlerId?.verdi ?: return ResponseEntity
                 .badRequest()
                 .body("Oppdatering av samhandler må ha angitt samhandlerId!")
-        val samhandler = samhandlerRepository.findByIdent(samhandlerIdent) ?: return ResponseEntity.notFound().build<Any>()
+        val samhandler =
+            samhandlerRepository.findByIdent(samhandlerIdent) ?: return ResponseEntity.notFound().build<Any>()
 
         val oppdatertSamhandler =
             samhandler.copy(
@@ -115,9 +134,12 @@ class SamhandlerService(
                 kontaktEpost = samhandlerDto.kontaktEpost,
                 kontaktTelefon = samhandlerDto.kontaktTelefon,
                 notat = samhandlerDto.notat,
+                erOpphørt = samhandlerDto.erOpphørt,
             )
 
-        samhandlerRepository.save(oppdatertSamhandler)
+        val oppdatertSamhander = samhandlerRepository.save(oppdatertSamhandler)
+        sendKafkamelding(oppdatertSamhander, SamhandlerKafkaHendelsestype.OPPDATERT)
+
         SECURE_LOGGER.info(
             "OppdaterSamhandler for {} utført av {} fra data: {}",
             samhandlerDto.samhandlerId,
@@ -126,5 +148,18 @@ class SamhandlerService(
         )
 
         return ResponseEntity.ok(SamhandlerMapper.mapTilSamhandlerDto(oppdatertSamhandler))
+    }
+
+    private fun sendKafkamelding(
+        samhandler: Samhandler,
+        hendelsestype: SamhandlerKafkaHendelsestype,
+    ) {
+        val samhandlerMelding =
+            SamhandlerMelding(
+                samhandler.ident!!,
+                hendelsestype,
+                MdcConstants.MDC_CALL_ID,
+            )
+        samhandlerProducer.sendSamhandlerMelding(samhandlerMelding)
     }
 }
