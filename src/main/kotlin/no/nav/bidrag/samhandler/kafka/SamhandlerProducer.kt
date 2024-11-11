@@ -31,14 +31,16 @@ class SamhandlerProducer(
     ) {
         val melding = objectMapper.writeValueAsString(samhandlerMelding)
         kafkaTemplate
-            .send(topic, samhandlerMelding.samhandlerId.toString(), melding)
+            .send(topic, samhandlerMelding.samhandlerId, melding)
             .thenAccept {
                 logger.info(
-                    "Melding på topic $topic for samhandlerId ${samhandlerMelding.samhandlerId} er sendt. Fikk offset ${it?.recordMetadata?.offset()}",
+                    "Melding på topic $topic for samhandlerId ${samhandlerMelding.samhandlerId} er sendt. " +
+                        "Fikk offset ${it?.recordMetadata?.offset()}",
                 )
             }.exceptionally {
                 val feilmelding =
-                    "Melding på topic $topic kan ikke sendes for samhandlerId ${samhandlerMelding.samhandlerId}. Feiler med ${it.message}"
+                    "Melding på topic $topic kan ikke sendes for samhandlerId ${samhandlerMelding.samhandlerId}. " +
+                        "Feiler med ${it.message}"
                 logger.warn(feilmelding)
                 error(feilmelding)
             }
