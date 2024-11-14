@@ -30,3 +30,8 @@ spring:
         sslcert: ""
         sslkey: ""
         sslrootcert: ""
+  kafka:
+    properties:
+      security.protocol: PLAINTEXT
+    consumer:
+      auto-offset-reset: earliest
