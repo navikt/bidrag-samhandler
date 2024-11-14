@@ -50,7 +50,8 @@ class SamhandlerController(
         @RequestBody ident: Ident,
         inkluderAuditLog: Boolean = false,
     ): ResponseEntity<*> {
-        val samhandler = samhandlerService.hentSamhandler(ident, inkluderAuditLog) ?: return ResponseEntity.notFound().build<Any>()
+        val samhandler =
+            samhandlerService.hentSamhandler(ident, inkluderAuditLog) ?: return ResponseEntity.notFound().build<Any>()
         return ResponseEntity.ok(samhandler)
     }
 
@@ -100,10 +101,21 @@ class SamhandlerController(
     )
     @Parameters(
         value = [
-            Parameter(name = "samhandlere", example = "[\"80000000001\", \"80000000002\", \"80000000003\"]"),
+            Parameter(name = "samhandlerListe"),
         ],
     )
+    @Deprecated(
+        message =
+            "Dette endepunktet er opprettet for å masse-importere samhandlere fra TSS i forbindelse med prodsetting. " +
+                "Bør slettes etterpå.",
+    )
     fun opprettSamhandlerFraListe(
-        @RequestBody samhandlere: List<Ident>,
-    ): ResponseEntity<*> = ResponseEntity.ok(samhandlerService.importerSamhandlereFraTss(samhandlere))
+        @RequestBody samhandlerListe: SamhandlerListe,
+    ): ResponseEntity<*> = ResponseEntity.ok(samhandlerService.importerSamhandlereFraTss(samhandlerListe.samhandlere))
 }
+
+@Schema
+data class SamhandlerListe(
+    @Schema(name = "samhandlere", type = "array", example = "[\"80000000001\", \"80000000002\", \"80000000003\"]")
+    val samhandlere: List<Ident>,
+)
