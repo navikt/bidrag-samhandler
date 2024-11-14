@@ -14,6 +14,8 @@ database:
   navn: bidrag-samhandler-q1
   tier: db-f1-micro
   size: 10
+kafka:
+  pool: nav-dev
 env:
   MQ_CONN_NAME: b27apvl220.preprod.local(1413)
   MQ_HOST: b27apvl220.preprod.local
@@ -22,6 +24,7 @@ env:
   MQ_QUEUE_MANAGER: MQLS02
   MQ_TSS_REQUEST_QUEUE: queue:///QA.Q1_415.AS10_SAMHANDLER_SERVICE?targetClient=1
   JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+  TOPIC_SAMHANDLER: bidrag.samhandler-q1
 azure_access_inbound:
   - application: bidrag-sak-q1
     namespace: bidrag

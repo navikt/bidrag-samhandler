@@ -26,6 +26,8 @@ spec:
   secureLogs:
     enabled: true
   image: {{ image }}
+  kafka:
+    pool: {{ kafka.pool }}
   liveness:
     path: /actuator/health
     initialDelay: 30

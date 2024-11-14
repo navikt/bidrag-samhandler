@@ -14,6 +14,8 @@ database:
   navn: bidrag-samhandler-prod
   tier: db-custom-1-3840
   size: 25
+kafka:
+  pool: nav-prod
 env:
   MQ_CONN_NAME: mpls02.adeo.no(1414)
   MQ_HOST: mpls02.adeo.no
@@ -21,6 +23,7 @@ env:
   MQ_CHANNEL: P_BIDRAG_SAMHANDLER
   MQ_QUEUE_MANAGER: MPLS02
   MQ_TSS_REQUEST_QUEUE: queue:///QA.P415.AS10_SAMHANDLER_SERVICE?targetClient=1
+  TOPIC_SAMHANDLER: bidrag.samhandler
 azure_access_inbound:
   - application: bidrag-sak
     namespace: bidrag
