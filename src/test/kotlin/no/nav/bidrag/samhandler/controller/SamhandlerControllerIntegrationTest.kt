@@ -12,14 +12,22 @@ import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
+import org.springframework.kafka.test.context.EmbeddedKafka
 
+@EmbeddedKafka(
+    partitions = 1,
+    brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"],
+    topics = ["\${TOPIC_SAMHANDLER}"],
+)
 class SamhandlerControllerIntegrationTest : SpringTestRunner() {
     fun urlForPost() = rootUriComponentsBuilder().pathSegment("samhandler").build().toUri()
 
     fun urlForGet() =
-        rootUriComponentsBuilder().pathSegment("samhandler")
+        rootUriComponentsBuilder()
+            .pathSegment("samhandler")
             .queryParams(SøkSamhandlerQuery("navn", "postnummer", "område").toQueryParams())
-            .build().toUri()
+            .build()
+            .toUri()
 
     @Test
     fun `post for Ident retunerer korrekt bygd SamhandlerDto`() {
