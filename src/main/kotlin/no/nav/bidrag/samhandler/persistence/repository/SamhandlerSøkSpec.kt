@@ -18,6 +18,7 @@ object SamhandlerSøkSpec {
             .and(banknavnEquals(samhandlerSøk))
             .and(banklandkodeEquals(samhandlerSøk))
             .and(bankcodeEquals(samhandlerSøk))
+            .and(erIkkeOpphørt())
 
     private fun navnLike(samhandlerSøk: SamhandlerSøk): Specification<Samhandler> =
         Specification<Samhandler> { root, _, criteriaBuilder ->
@@ -149,5 +150,10 @@ object SamhandlerSøkSpec {
                     samhandlerSøk.bankcode!!.uppercase(),
                 )
             }
+        }
+
+    private fun erIkkeOpphørt(): Specification<Samhandler> =
+        Specification<Samhandler> { root, _, criteriaBuilder ->
+            criteriaBuilder.isFalse(root.get("erOpphørt"))
         }
 }
