@@ -4,6 +4,7 @@ import no.nav.bidrag.commons.security.utils.TokenUtils
 import no.nav.bidrag.commons.web.MdcConstants
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.samhandler.SECURE_LOGGER
+import no.nav.bidrag.samhandler.exception.SamhandlerNotFoundException
 import no.nav.bidrag.samhandler.kafka.SamhandlerProducer
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.persistence.entity.Samhandler
@@ -100,8 +101,12 @@ class SamhandlerService(
     )
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun importerSamhandlereFraTss(samhandlere: List<Ident>) {
-        samhandlere.forEach {
-            hentSamhandler(it, false)
+        try {
+            samhandlere.forEach {
+                hentSamhandler(it, false)
+            }
+        } catch (e: SamhandlerNotFoundException) {
+            SECURE_LOGGER.error("Feil ved import av samhandlere fra TSS: {}", e.message)
         }
     }
 
