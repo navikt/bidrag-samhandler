@@ -96,21 +96,13 @@ class SamhandlerService(
         message =
             "Dette endepunktet er opprettet for å masse-importere samhandlere fra TSS i forbindelse med prodsetting. " +
                 "Bør slettes etterpå.",
+        replaceWith = ReplaceWith("samhandlere.forEach { hentSamhandler(it, false) }"),
     )
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun importerSamhandlereFraTss(samhandlere: List<Ident>): List<Int> {
-        val opprettetSamhandlerListe = mutableListOf<Samhandler>()
+    fun importerSamhandlereFraTss(samhandlere: List<Ident>) {
         samhandlere.forEach {
-            val hentetSamhandler = tssService.hentSamhandler(it)
-            hentetSamhandler?.let {
-                val mapTilSamhandler =
-                    SamhandlerMapper.mapTilSamhandler(hentetSamhandler, true, hentetSamhandler.erOpphørt)
-                val opprettetSamhandler = samhandlerRepository.save(mapTilSamhandler)
-                sendKafkamelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
-                opprettetSamhandlerListe.add(opprettetSamhandler)
-            }
+            hentSamhandler(it, false)
         }
-        return opprettetSamhandlerListe.map { it.id }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
