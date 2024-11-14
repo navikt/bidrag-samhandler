@@ -92,6 +92,27 @@ class SamhandlerService(
         return opprettetSamhandler.id
     }
 
+    @Deprecated(
+        message =
+            "Dette endepunktet er opprettet for å masse-importere samhandlere fra TSS i forbindelse med prodsetting. " +
+                "Bør slettes etterpå.",
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun importerSamhandlereFraTss(samhandlere: List<Ident>): List<Int> {
+        val opprettetSamhandlerListe = mutableListOf<Samhandler>()
+        samhandlere.forEach {
+            val hentetSamhandler = tssService.hentSamhandler(it)
+            hentetSamhandler?.let {
+                val mapTilSamhandler =
+                    SamhandlerMapper.mapTilSamhandler(hentetSamhandler, true, hentetSamhandler.erOpphørt)
+                val opprettetSamhandler = samhandlerRepository.save(mapTilSamhandler)
+                sendKafkamelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
+                opprettetSamhandlerListe.add(opprettetSamhandler)
+            }
+        }
+        return opprettetSamhandlerListe.map { it.id }
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun hentSamhandlerPåId(samhandlerId: Int) =
         samhandlerRepository.findById(samhandlerId).getOrNull()?.let {

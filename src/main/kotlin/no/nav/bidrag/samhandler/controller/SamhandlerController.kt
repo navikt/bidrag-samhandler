@@ -1,6 +1,8 @@
 package no.nav.bidrag.samhandler.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.Parameters
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -90,4 +92,18 @@ class SamhandlerController(
     fun oppdaterSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> = samhandlerService.oppdaterSamhandler(samhandlerDto)
+
+    @PostMapping("/importerSamhandlerFraTss")
+    @Operation(
+        description = "Importerer samhandlere fra tss.",
+        security = [SecurityRequirement(name = "bearer-key")],
+    )
+    @Parameters(
+        value = [
+            Parameter(name = "samhandlere", example = "[\"80000000001\", \"80000000002\", \"80000000003\"]"),
+        ],
+    )
+    fun opprettSamhandlerFraListe(
+        @RequestBody samhandlere: List<Ident>,
+    ): ResponseEntity<*> = ResponseEntity.ok(samhandlerService.importerSamhandlereFraTss(samhandlere))
 }
