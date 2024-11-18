@@ -40,7 +40,7 @@ class SamhandlerService(
 
         val hentetSamhandler = tssService.hentSamhandler(ident)
         hentetSamhandler?.let {
-            val mapTilSamhandler = SamhandlerMapper.mapTilSamhandler(hentetSamhandler, true, hentetSamhandler.erOpphørt)
+            val mapTilSamhandler = SamhandlerMapper.mapTilSamhandler(hentetSamhandler, true, hentetSamhandler.erOpphørt ?: false)
             val opprettetSamhandler = samhandlerRepository.save(mapTilSamhandler)
             sendKafkamelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
         }
@@ -153,7 +153,7 @@ class SamhandlerService(
                 kontaktEpost = samhandlerDto.kontaktEpost,
                 kontaktTelefon = samhandlerDto.kontaktTelefon,
                 notat = samhandlerDto.notat,
-                erOpphørt = samhandlerDto.erOpphørt,
+                erOpphørt = samhandlerDto.erOpphørt ?: false,
             )
 
         val oppdatertSamhander = samhandlerRepository.save(oppdatertSamhandler)
