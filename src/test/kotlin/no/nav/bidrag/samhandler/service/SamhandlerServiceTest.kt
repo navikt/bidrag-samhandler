@@ -5,10 +5,10 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import no.nav.bidrag.domene.ident.Ident
-import no.nav.bidrag.samhandler.kafka.SamhandlerProducer
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.persistence.entity.Samhandler
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
@@ -27,8 +27,8 @@ class SamhandlerServiceTest {
     @MockK(relaxed = true)
     private lateinit var samhandlerRepository: SamhandlerRepository
 
-    @MockK(relaxed = true)
-    private lateinit var samhandlerProducer: SamhandlerProducer
+    @RelaxedMockK
+    private lateinit var kafkaService: KafkaService
 
     @InjectMockKs
     private lateinit var samhandlerService: SamhandlerService

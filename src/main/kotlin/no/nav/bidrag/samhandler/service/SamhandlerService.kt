@@ -1,22 +1,18 @@
 package no.nav.bidrag.samhandler.service
 
+import jakarta.persistence.EntityManager
 import no.nav.bidrag.commons.security.utils.TokenUtils
-import no.nav.bidrag.commons.web.MdcConstants
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.samhandler.SECURE_LOGGER
 import no.nav.bidrag.samhandler.exception.SamhandlerNotFoundException
-import no.nav.bidrag.samhandler.kafka.SamhandlerProducer
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
-import no.nav.bidrag.samhandler.persistence.entity.Samhandler
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerKafkaHendelsestype
 import no.nav.bidrag.transport.samhandler.SamhandlerSøk
-import no.nav.bidrag.transport.samhandler.Samhandlerhendelse
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
-import org.slf4j.MDC
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
@@ -27,8 +23,10 @@ import kotlin.jvm.optionals.getOrNull
 class SamhandlerService(
     private val tssService: TssService,
     private val samhandlerRepository: SamhandlerRepository,
-    private val samhandlerProducer: SamhandlerProducer,
+    private val kafkaService: KafkaService,
+    private val entityManager: EntityManager,
 ) {
+    @Transactional
     fun hentSamhandler(
         ident: Ident,
         inkluderAuditLog: Boolean,
@@ -42,7 +40,8 @@ class SamhandlerService(
         hentetSamhandler?.let {
             val mapTilSamhandler = SamhandlerMapper.mapTilSamhandler(hentetSamhandler, true, hentetSamhandler.erOpphørt ?: false)
             val opprettetSamhandler = samhandlerRepository.save(mapTilSamhandler)
-            sendKafkamelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
+            entityManager.refresh(opprettetSamhandler)
+            kafkaService.sendSamhandlerMelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
         }
         return hentetSamhandler
     }
@@ -78,7 +77,7 @@ class SamhandlerService(
         return SamhandlerMapper.mapTilSamhandlersøkeresultatDto(samhandlere)
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     fun opprettSamhandler(samhandlerDto: SamhandlerDto): Int {
         val samhandler = SamhandlerMapper.mapTilSamhandler(samhandlerDto)
         SECURE_LOGGER.info(
@@ -88,8 +87,8 @@ class SamhandlerService(
             samhandlerDto,
         )
         val opprettetSamhandler = samhandlerRepository.save(samhandler)
-
-        sendKafkamelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
+        entityManager.refresh(opprettetSamhandler)
+        kafkaService.sendSamhandlerMelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
 
         return opprettetSamhandler.id
     }
@@ -157,7 +156,8 @@ class SamhandlerService(
             )
 
         val oppdatertSamhander = samhandlerRepository.save(oppdatertSamhandler)
-        sendKafkamelding(oppdatertSamhander, SamhandlerKafkaHendelsestype.OPPDATERT)
+        entityManager.refresh(oppdatertSamhander)
+        kafkaService.sendSamhandlerMelding(oppdatertSamhander, SamhandlerKafkaHendelsestype.OPPDATERT)
 
         SECURE_LOGGER.info(
             "OppdaterSamhandler for {} utført av {} fra data: {}",
@@ -167,18 +167,5 @@ class SamhandlerService(
         )
 
         return ResponseEntity.ok(SamhandlerMapper.mapTilSamhandlerDto(oppdatertSamhandler))
-    }
-
-    private fun sendKafkamelding(
-        samhandler: Samhandler,
-        hendelsestype: SamhandlerKafkaHendelsestype,
-    ) {
-        val samhandlerhendelse =
-            Samhandlerhendelse(
-                samhandler.ident!!,
-                hendelsestype,
-                MDC.get(MdcConstants.MDC_CALL_ID),
-            )
-        samhandlerProducer.sendSamhandlerMelding(samhandlerhendelse)
     }
 }
