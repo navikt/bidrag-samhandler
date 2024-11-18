@@ -78,17 +78,8 @@ class SamhandlerService(
         return SamhandlerMapper.mapTilSamhandlersøkeresultatDto(samhandlere)
     }
 
-    @Transactional
-    fun opprettSamhandler(samhandlerDto: SamhandlerDto): Int {
-        val opprettetSamhandler = opprettNySamhandler(samhandlerDto)
-
-        sendKafkamelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
-
-        return opprettetSamhandler.id
-    }
-
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun opprettNySamhandler(samhandlerDto: SamhandlerDto): Samhandler {
+    fun opprettSamhandler(samhandlerDto: SamhandlerDto): Int {
         val samhandler = SamhandlerMapper.mapTilSamhandler(samhandlerDto)
         SECURE_LOGGER.info(
             "OpprettSamhandler for {} utført av {} med følgende data: {}",
@@ -97,7 +88,10 @@ class SamhandlerService(
             samhandlerDto,
         )
         val opprettetSamhandler = samhandlerRepository.save(samhandler)
-        return opprettetSamhandler
+
+        sendKafkamelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
+
+        return opprettetSamhandler.id
     }
 
     @Deprecated(
