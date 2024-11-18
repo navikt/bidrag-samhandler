@@ -16,6 +16,7 @@ import no.nav.bidrag.transport.samhandler.SamhandlerSøk
 import no.nav.bidrag.transport.samhandler.Samhandlerhendelse
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
+import org.slf4j.MDC
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
@@ -176,7 +177,7 @@ class SamhandlerService(
             Samhandlerhendelse(
                 samhandler.ident!!,
                 hendelsestype,
-                MdcConstants.MDC_CALL_ID,
+                MDC.get(MdcConstants.MDC_CALL_ID),
             )
         samhandlerProducer.sendSamhandlerMelding(samhandlerhendelse)
     }
