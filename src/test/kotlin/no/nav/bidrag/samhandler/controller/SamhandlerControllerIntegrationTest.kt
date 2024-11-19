@@ -56,6 +56,7 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
                         bankCode = "bankKode",
                         valutakode = "kodeValuta",
                     ),
+                erOpphørt = false,
             )
 
         val responseEntity =

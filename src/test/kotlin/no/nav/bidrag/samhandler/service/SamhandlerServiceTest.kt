@@ -4,10 +4,10 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
+import jakarta.persistence.EntityManager
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.persistence.entity.Samhandler
@@ -21,14 +21,17 @@ import java.util.Optional
 
 @ExtendWith(MockKExtension::class)
 class SamhandlerServiceTest {
-    @MockK(relaxed = true)
+    @RelaxedMockK
     private lateinit var tssService: TssService
 
-    @MockK(relaxed = true)
+    @RelaxedMockK
     private lateinit var samhandlerRepository: SamhandlerRepository
 
     @RelaxedMockK
     private lateinit var kafkaService: KafkaService
+
+    @RelaxedMockK
+    private lateinit var entityManager: EntityManager
 
     @InjectMockKs
     private lateinit var samhandlerService: SamhandlerService
