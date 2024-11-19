@@ -4,6 +4,7 @@ AZURE_APP_TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851
 AZURE_APP_CLIENT_ID: <app_client_id>
 AZURE_APP_CLIENT_SECRET: unset
 server.port: 8999
+TOPIC_SAMHANDLER: bidrag.samhandler-test
 NAIS_APP_NAME: bidrag-samhandler
 ibm:
   mq:
@@ -14,3 +15,23 @@ ibm:
     password: passw0rd
     application-name: bidrag-samhandler
     tssRequestQueue: DEV.QUEUE.1
+
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:/db/migration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/default_database?user=cloudsqliamuser&password=samhandleradmin
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      data-source-properties:
+        ssl: false
+        sslmode: disable
+        sslcert: ""
+        sslkey: ""
+        sslrootcert: ""
+  kafka:
+    properties:
+      security.protocol: PLAINTEXT
+    consumer:
+      auto-offset-reset: earliest

@@ -1,0 +1,18 @@
+services:
+  database:
+    image: postgres:15.8
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: cloudsqliamuser
+      POSTGRES_PASSWORD: samhandleradmin
+      POSTGRES_DB: default_database
+
+  mq:
+    image: ibmcom/mq
+    ports:
+      - "1414:1414"
+    environment:
+      - LICENSE=accept
+      - MQ_QMGR_NAME=QM1
+      - MQ_ADMIN_PASSWORD=passw0rd

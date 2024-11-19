@@ -26,29 +26,43 @@ spec:
   secureLogs:
     enabled: true
   image: {{ image }}
+  kafka:
+    pool: {{ kafka.pool }}
   liveness:
     path: /actuator/health
     initialDelay: 30
     timeout: 1
-    periodSeconds: 10
+    periodSeconds: 5
     failureThreshold: 10
   readiness:
     path: /actuator/health
-    initialDelay: 30
-    periodSeconds: 10
+    initialDelay: 20
     timeout: 1
   prometheus:
     enabled: true
     path: /actuator/prometheus
   resources:
     limits:
-      cpu: 500m
-      memory: 1024Mi
+      cpu: {{limits.cpu}}
+      memory: {{limits.memory}}
     requests:
-      cpu: 250m
-      memory: 512Mi
+      cpu: {{requests.cpu}}
+      memory: {{requests.memory}}
+  replicas:
+    disableAutoScaling: true
+    max: {{replicas.max}}
+    min: {{replicas.min}}
   envFrom:
     - secret: bidrag-samhandler-mq-password
+  gcp:
+    sqlInstances:
+      - name: {{ database.navn }}
+        type: POSTGRES_15
+        diskSize: {{ database.size }}
+        tier: {{ database.tier }}
+        databases:
+          - name: bidrag-samhandler
+            envVarPrefix: DB
   ingresses:
   {{#each ingresses as |url|}}
     - {{url}}
