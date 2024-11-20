@@ -155,9 +155,8 @@ class SamhandlerService(
                 erOpphørt = samhandlerDto.erOpphørt ?: false,
             )
 
-        val oppdatertSamhander = samhandlerRepository.save(oppdatertSamhandler)
-        entityManager.refresh(oppdatertSamhander)
-        kafkaService.sendSamhandlerMelding(oppdatertSamhander, SamhandlerKafkaHendelsestype.OPPDATERT)
+        val lagretSamhandler = samhandlerRepository.save(oppdatertSamhandler)
+        kafkaService.sendSamhandlerMelding(lagretSamhandler, SamhandlerKafkaHendelsestype.OPPDATERT)
 
         SECURE_LOGGER.info(
             "OppdaterSamhandler for {} utført av {} fra data: {}",
