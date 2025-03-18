@@ -90,7 +90,7 @@ class SamhandlerService(
         entityManager.refresh(opprettetSamhandler)
         kafkaService.sendSamhandlerMelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
 
-        return opprettetSamhandler.id
+        return opprettetSamhandler.id!!
     }
 
     @Deprecated(

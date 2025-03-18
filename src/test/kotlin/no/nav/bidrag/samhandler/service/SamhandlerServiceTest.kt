@@ -43,7 +43,7 @@ class SamhandlerServiceTest {
     @BeforeEach
     fun setUp() {
         ident = Ident("12345678901")
-        samhandler = Samhandler(ident = "12345678901")
+        samhandler = Samhandler(id = 0, ident = "12345678901")
         samhandlerDto = SamhandlerMapper.mapTilSamhandlerDto(samhandler)
     }
 
@@ -77,18 +77,18 @@ class SamhandlerServiceTest {
 
     @Test
     fun `hentSamhandlerPåId skal returnere SamhandlerDto når samhandler finnes`() {
-        every { samhandlerRepository.findById(samhandler.id) } returns Optional.of(samhandler)
-        val result = samhandlerService.hentSamhandlerPåId(samhandler.id)
+        every { samhandlerRepository.findById(samhandler.id!!) } returns Optional.of(samhandler)
+        val result = samhandlerService.hentSamhandlerPåId(samhandler.id!!)
         result shouldNotBe null
-        verify { samhandlerRepository.findById(samhandler.id) }
+        verify { samhandlerRepository.findById(samhandler.id!!) }
     }
 
     @Test
     fun `hentSamhandlerPåId skal returnere null når samhandler ikke finnes`() {
-        every { samhandlerRepository.findById(samhandler.id) } returns Optional.empty()
-        val result = samhandlerService.hentSamhandlerPåId(samhandler.id)
+        every { samhandlerRepository.findById(samhandler.id!!) } returns Optional.empty()
+        val result = samhandlerService.hentSamhandlerPåId(samhandler.id!!)
         result shouldBe null
-        verify { samhandlerRepository.findById(samhandler.id) }
+        verify { samhandlerRepository.findById(samhandler.id!!) }
     }
 
     @Test

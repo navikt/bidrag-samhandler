@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 data class AuditLog(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int = 0,
+    val id: Int? = null,
     val tabellNavn: String = "",
     val tabellId: Int = 0,
     val operasjon: String = "",

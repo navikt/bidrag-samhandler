@@ -19,7 +19,7 @@ data class Samhandler(
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int = 0,
+    val id: Int? = null,
     @Column(name = "ident")
     @ColumnDefault("nextval('ident_seq')")
     val ident: String? = null,
