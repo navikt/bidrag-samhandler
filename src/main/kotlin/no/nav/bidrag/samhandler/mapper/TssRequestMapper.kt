@@ -28,8 +28,8 @@ object TssRequestMapper {
         return TssSamhandlerData().apply { tssInputData = inputData }
     }
 
-    private fun getSamhandlerIDataB940Data(søkSamhandlerQuery: SøkSamhandlerQuery): SamhandlerIDataB940Type {
-        return SamhandlerIDataB940Type().apply {
+    private fun getSamhandlerIDataB940Data(søkSamhandlerQuery: SøkSamhandlerQuery): SamhandlerIDataB940Type =
+        SamhandlerIDataB940Type().apply {
             brukerID = TssService.BRUKER_ID
             navnSamh = søkSamhandlerQuery.navn
             kodeSamhType = "KRED"
@@ -37,7 +37,6 @@ object TssRequestMapper {
             omrade = søkSamhandlerQuery.område
             buffnr = søkSamhandlerQuery.side.toString().padStart(3, '0')
         }
-    }
 
     private fun createSamhandlerIDataB910Type(ident: Ident) =
         SamhandlerIDataB910Type()
@@ -56,12 +55,14 @@ object TssRequestMapper {
                     idOff = ident.verdi
                     kodeIdType = "FNR"
                 }
+
             Identtype.Organisasjonsnummer ->
                 TidOFF1().apply {
                     idOff = ident.verdi
                     kodeIdType = "ORG"
                     kodeSamhType = "INST"
                 }
+
             Identtype.SamhandlerId -> null
             Identtype.Ukjent -> throw IllegalArgumentException("Ukjent identtype ${ident.type()}")
         }

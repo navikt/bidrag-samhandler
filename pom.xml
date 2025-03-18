@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.3</version>
+		<version>3.4.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>no.nav</groupId>
@@ -23,9 +23,9 @@
 		<jakarta.xml.ws-api.version>4.0.1</jakarta.xml.ws-api.version>
 		<jaxws.version>4.0.3</jaxws.version>
 		<jaxws-maven-plugin.version>4.0.2</jaxws-maven-plugin.version>
-		<mockk.version>1.13.12</mockk.version>
-		<kotlin-logging-jvm.version>6.0.9</kotlin-logging-jvm.version>
-		<ktlint.version>1.2.1</ktlint.version>
+		<mockk.version>1.13.17</mockk.version>
+		<kotlin-logging-jvm.version>7.0.5</kotlin-logging-jvm.version>
+		<ktlint.version>1.4.1</ktlint.version>
 		<hypersistence-utils-hibernate.version>3.8.3</hypersistence-utils-hibernate.version>
 	</properties>
 
@@ -264,22 +264,6 @@
 			<artifactId>mockk-jvm</artifactId>
 			<version>${mockk.version}</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-contract-stub-runner</artifactId>
-			<version>${springframework-cloud.version}</version>
-			<scope>test</scope>
-			<exclusions>
-			<exclusion>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-			</exclusion>
-			<exclusion>
-				<groupId>commons-collections</groupId>
-				<artifactId>commons-collections</artifactId>
-			</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>no.nav.security</groupId>
