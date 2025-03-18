@@ -6,4 +6,6 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding
 @ConfigurationProperties(prefix = "ibm.mq")
 class MQProperties
     @ConstructorBinding
-    constructor(val tssRequestQueue: String)
+    constructor(
+        val tssRequestQueue: String,
+    )

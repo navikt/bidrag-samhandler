@@ -43,22 +43,17 @@ class SpringTestRunner {
     }
 
     private fun resetWiremockServers() {
-        applicationContext.getBeansOfType(WireMockServer::class.java)
+        applicationContext
+            .getBeansOfType(WireMockServer::class.java)
             .values
             .forEach(WireMockServer::resetRequests)
     }
 
-    fun rootUri(): String {
-        return LOCALHOST + port
-    }
+    fun rootUri(): String = LOCALHOST + port
 
-    fun rootUriComponentsBuilder(): UriComponentsBuilder {
-        return UriComponentsBuilder.fromHttpUrl(rootUri())
-    }
+    fun rootUriComponentsBuilder(): UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(rootUri())
 
-    protected fun getPort(): String {
-        return port.toString()
-    }
+    protected fun getPort(): String = port.toString()
 
     val httpHeaderTestRestTemplate
         get() =

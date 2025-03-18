@@ -20,12 +20,11 @@ class CacheConfig {
     }
 
     @Bean
-    fun cacheManager(): CacheManager {
-        return CaffeineCacheManager().apply {
+    fun cacheManager(): CacheManager =
+        CaffeineCacheManager().apply {
             registerCustomCache(
                 SAMHANDLER_CACHE,
                 Caffeine.newBuilder().expireAfter(InvaliderCacheFørStartenAvArbeidsdag()).build(),
             )
         }
-    }
 }
