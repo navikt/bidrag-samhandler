@@ -22,11 +22,11 @@
 		<kotest.version>5.9.1</kotest.version>
 		<jakarta.xml.ws-api.version>4.0.1</jakarta.xml.ws-api.version>
 		<jaxws.version>4.0.3</jaxws.version>
-		<jaxws-maven-plugin.version>4.0.2</jaxws-maven-plugin.version>
+		<jaxws-maven-plugin.version>4.0.3</jaxws-maven-plugin.version>
 		<mockk.version>1.13.17</mockk.version>
 		<kotlin-logging-jvm.version>7.0.5</kotlin-logging-jvm.version>
 		<ktlint.version>1.4.1</ktlint.version>
-		<hypersistence-utils-hibernate.version>3.8.3</hypersistence-utils-hibernate.version>
+		<hypersistence-utils-hibernate.version>3.9.5</hypersistence-utils-hibernate.version>
 		<spring-cloud-contract-wiremock.version>4.2.0</spring-cloud-contract-wiremock.version>
 	</properties>
 
@@ -294,6 +294,7 @@
 
 
 	<build>
+		<finalName>app</finalName>
 		<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
 		<plugins>

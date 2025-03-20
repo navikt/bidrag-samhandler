@@ -2,10 +2,9 @@ name: bidrag-samhandler-q4
 ingresses:
   - https://bidrag-samhandler-q4.intern.dev.nav.no
 limits:
-  cpu: 1000m
   memory: 1012Mi
 requests:
-  cpu: 250m
+  cpu: 50m
   memory: 512Mi
 replicas:
   max: 1
