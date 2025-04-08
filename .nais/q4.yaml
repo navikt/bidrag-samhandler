@@ -29,7 +29,7 @@ azure_access_inbound:
   - application: bidrag-sak-q4
     namespace: bidrag
     cluster: dev-fss
-  - application: bidrag-ui-q4
+  - application: bidrag-ui
     namespace: bidrag
     cluster: dev-fss
   - application: bidrag-aktoerregister-q4
