@@ -21,6 +21,9 @@ spec:
       allowAllUsers: true
   accessPolicy:
     outbound:
+      rules:
+       - application: logging
+         namespace: nais-system
       external:
         - host: {{env.MQ_HOST}}
           ports:
