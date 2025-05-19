@@ -37,3 +37,6 @@ azure_access_inbound:
   - application: bisys
     namespace: bidrag
     cluster: prod-fss
+  - application: bidrag-automatisk-jobb
+    namespace: bidrag
+    cluster: prod-gcp
