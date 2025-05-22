@@ -44,12 +44,19 @@ class SamhandlerController(
                 responseCode = "204",
                 description = "Samhandler finnes ikke.",
             ),
+            ApiResponse(
+                responseCode = "404",
+                description =
+                    "Innsendt ident er ikke en gyldig samhandler. Samhandlere begynner alltid på 8 eller 9 og har 11 siffer. " +
+                        "Evalueres mot regex ^[89]\\d{10}$",
+            ),
         ],
     )
     fun hentSamhandler(
         @RequestBody ident: Ident,
         inkluderAuditLog: Boolean = false,
     ): ResponseEntity<*> {
+        if (!ident.erSamhandlerId()) return ResponseEntity.badRequest().build<Any>()
         val samhandler =
             samhandlerService.hentSamhandler(ident, inkluderAuditLog) ?: return ResponseEntity.noContent().build<Any>()
         return ResponseEntity.ok(samhandler)
