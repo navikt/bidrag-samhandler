@@ -25,7 +25,7 @@
 		<jaxws-maven-plugin.version>4.0.3</jaxws-maven-plugin.version>
 		<mockk.version>1.13.17</mockk.version>
 		<kotlin-logging-jvm.version>7.0.5</kotlin-logging-jvm.version>
-		<ktlint.version>1.4.1</ktlint.version>
+		<ktlint.version>1.6.0</ktlint.version>
 		<hypersistence-utils-hibernate.version>3.9.5</hypersistence-utils-hibernate.version>
 		<spring-cloud-contract-wiremock.version>4.2.0</spring-cloud-contract-wiremock.version>
 	</properties>
