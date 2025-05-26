@@ -7,6 +7,7 @@ import org.springframework.jms.support.converter.MessageConverter
 import org.springframework.stereotype.Service
 import java.util.UUID
 
+@Deprecated("TSS-integrasjon skal fjernes.")
 @Service
 class MqClient(
     private val jmsTemplate: JmsTemplate,

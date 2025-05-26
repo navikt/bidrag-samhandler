@@ -1,6 +1,9 @@
 package no.nav.bidrag.samhandler.mapper
 
 import no.nav.bidrag.commons.util.trimToNull
+import no.nav.bidrag.domene.enums.diverse.Språk
+import no.nav.bidrag.domene.enums.samhandler.OffentligIdType
+import no.nav.bidrag.domene.enums.samhandler.Valutakode
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.domene.ident.SamhandlerId
 import no.nav.bidrag.domene.land.Landkode3
@@ -30,7 +33,7 @@ object SamhandlerMapper {
                 offentligId = samhandler.offentligId,
                 offentligIdType = samhandler.offentligIdType,
                 språk = samhandler.språk,
-                områdekode = samhandler.områdekode?.let { områdekode -> Områdekode.valueOf(områdekode) },
+                områdekode = samhandler.områdekode,
                 adresse =
                     AdresseDto(
                         it.adresselinje1,
@@ -79,7 +82,7 @@ object SamhandlerMapper {
 
     fun mapTilSamhandler(
         samhandlerDto: SamhandlerDto,
-        fraTss: Boolean = false,
+        fraTss: Boolean = false, // TODO(fjerne når TSS-integrasjon er fjernet),
         erOpphørt: Boolean = false,
     ): no.nav.bidrag.samhandler.persistence.entity.Samhandler =
         no.nav.bidrag.samhandler.persistence.entity.Samhandler(
@@ -88,7 +91,7 @@ object SamhandlerMapper {
             offentligId = samhandlerDto.offentligId,
             offentligIdType = samhandlerDto.offentligIdType,
             språk = samhandlerDto.språk,
-            områdekode = samhandlerDto.områdekode?.name,
+            områdekode = samhandlerDto.områdekode,
             norskkontonr = samhandlerDto.kontonummer?.norskKontonummer,
             iban = samhandlerDto.kontonummer?.iban,
             swift = samhandlerDto.kontonummer?.swift,
@@ -109,6 +112,7 @@ object SamhandlerMapper {
             erOpphørt = erOpphørt,
         )
 
+    @Deprecated("TSS-integrasjon skal fjernes.")
     fun mapTilSamhandlerDto(
         tssSamhandlerData: TssSamhandlerData,
         ident: Ident,
@@ -128,8 +132,12 @@ object SamhandlerMapper {
                 samhandlerId = mapTilTssEksternId(it.samhandlerAvd125, avdeling),
                 navn = samhandlerType?.navnSamh.trimToNull(),
                 offentligId = samhandlerType?.idOff.trimToNull(),
-                offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
-                språk = samhandlerType?.kodeSpraak,
+                offentligIdType =
+                    samhandlerType
+                        ?.kodeIdentType
+                        .trimToNull()
+                        ?.let { value -> OffentligIdType.valueOf(value) },
+                språk = samhandlerType?.kodeSpraak?.let { value -> Språk.valueOf(value) },
                 områdekode = mapOmrådekode(samhandler),
                 adresse = mapTilAdresse(it.adresse130, avdeling),
                 kontonummer = mapToKontonummer(it, avdeling),
@@ -166,6 +174,7 @@ object SamhandlerMapper {
                     }?.kodeFagOmrade
         }
 
+    @Deprecated("TSS-integrasjon skal fjernes.")
     fun mapTilSamhandlersøkeresultat(tssSamhandlerData: TssSamhandlerData): List<SamhandlerDto> =
         tssSamhandlerData.tssOutputData.samhandlerODataB940.enkeltSamhandler
             .map {
@@ -196,7 +205,7 @@ object SamhandlerMapper {
             samhandlerId = mapTilTssEksternId(enkeltSamhandler.samhandlerAvd125, avdeling),
             navn = samhandlerType?.navnSamh.trimToNull(),
             offentligId = samhandlerType?.idOff.trimToNull(),
-            offentligIdType = samhandlerType?.kodeIdentType.trimToNull(),
+            offentligIdType = samhandlerType?.kodeIdentType.trimToNull()?.let { OffentligIdType.valueOf(it) },
             adresse = mapTilAdresse(enkeltSamhandler.adresse130, avdeling),
         )
     }
@@ -268,7 +277,7 @@ object SamhandlerMapper {
                 banknavn = it.bankNavn?.trimToNull(),
                 norskKontonummer = it.gironrInnland?.trimToNull(),
                 swift = it.swiftKode?.trimToNull(),
-                valutakode = it.kodeValuta?.trimToNull(),
+                valutakode = it.kodeValuta?.trimToNull()?.let { value -> Valutakode.valueOf(value) },
                 bankCode = it.bankKode?.trimToNull(),
                 iban = it.gironrUtland?.trimToNull(),
             )

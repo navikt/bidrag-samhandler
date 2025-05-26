@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Protected
+@Deprecated("TSS-integrasjon skal fjernes.")
 class TssController(
     private val tssService: TssService,
 ) {

@@ -2,6 +2,8 @@ package no.nav.bidrag.samhandler.persistence.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -9,6 +11,10 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Version
+import no.nav.bidrag.domene.enums.diverse.Språk
+import no.nav.bidrag.domene.enums.samhandler.OffentligIdType
+import no.nav.bidrag.domene.enums.samhandler.Valutakode
+import no.nav.bidrag.transport.samhandler.Områdekode
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.DynamicInsert
 import java.time.LocalDateTime
@@ -28,11 +34,14 @@ data class Samhandler(
     @Column(name = "offentlig_id")
     val offentligId: String? = null,
     @Column(name = "offentlig_id_type")
-    val offentligIdType: String? = null,
+    @Enumerated(EnumType.STRING)
+    val offentligIdType: OffentligIdType? = null,
     @Column(name = "sprak")
-    val språk: String? = null,
+    @Enumerated(EnumType.STRING)
+    val språk: Språk? = null,
     @Column(name = "omradekode")
-    val områdekode: String? = null,
+    @Enumerated(EnumType.STRING)
+    val områdekode: Områdekode? = null,
     @Column(name = "norskkontonr")
     val norskkontonr: String? = null,
     @Column(name = "iban")
@@ -44,7 +53,8 @@ data class Samhandler(
     @Column(name = "banklandkode")
     val banklandkode: String? = null,
     @Column(name = "valutakode")
-    val valutakode: String? = null,
+    @Enumerated(EnumType.STRING)
+    val valutakode: Valutakode? = null,
     @Column(name = "bankcode")
     val bankcode: String? = null,
     @Column(name = "adresselinje1")

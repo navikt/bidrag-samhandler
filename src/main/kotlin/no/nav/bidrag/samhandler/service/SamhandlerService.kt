@@ -133,7 +133,7 @@ class SamhandlerService(
                         .body("Navn kan ikke være tomt! Mangler navn fra TSS må dette opprettes."),
                 offentligId = samhandlerDto.offentligId,
                 offentligIdType = samhandlerDto.offentligIdType,
-                områdekode = samhandlerDto.områdekode?.name,
+                områdekode = samhandlerDto.områdekode,
                 språk = samhandlerDto.språk,
                 norskkontonr = samhandlerDto.kontonummer?.norskKontonummer,
                 iban = samhandlerDto.kontonummer?.iban,

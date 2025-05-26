@@ -15,11 +15,13 @@ import no.rtv.namespacetss.TssSamhandlerData
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
+@Deprecated("TSS-integrasjon skal fjernes.")
 @Service
 class TssService(
     private val mqService: MqClient,
     private val mqProperties: MQProperties,
 ) {
+    @Deprecated("TSS-integrasjon skal fjernes.")
     @Cacheable("Samhandler")
     fun hentSamhandler(ident: Ident): SamhandlerDto? {
         val request = createTssSamhandlerRequest(ident)
@@ -29,6 +31,7 @@ class TssService(
         return SamhandlerMapper.mapTilSamhandlerDto(response, ident)
     }
 
+    @Deprecated("TSS-integrasjon skal fjernes.")
     fun hentSamhandlerData(ident: Ident): TssSamhandlerData {
         val request = createTssSamhandlerRequest(ident)
         val response: TssSamhandlerData = mqService.performRequestResponseSpring(mqProperties.tssRequestQueue, request)
@@ -37,6 +40,7 @@ class TssService(
         return response
     }
 
+    @Deprecated("TSS-integrasjon skal fjernes.")
     fun søkSamhandler(søkSamhandlerQuery: SøkSamhandlerQuery): SamhandlersøkeresultatDto {
         val request = createSamhandlersøkRequest(søkSamhandlerQuery)
         val response: TssSamhandlerData = mqService.performRequestResponseSpring(mqProperties.tssRequestQueue, request)

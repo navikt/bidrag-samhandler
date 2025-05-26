@@ -1,6 +1,8 @@
 package no.nav.bidrag.samhandler.controller
 
 import io.kotest.matchers.shouldBe
+import no.nav.bidrag.domene.enums.samhandler.OffentligIdType
+import no.nav.bidrag.domene.enums.samhandler.Valutakode
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.domene.ident.SamhandlerId
 import no.nav.bidrag.domene.land.Landkode3
@@ -36,7 +38,7 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
                 samhandlerId = SamhandlerId("80000000003"),
                 navn = "navnSamh",
                 offentligId = "idOff",
-                offentligIdType = "kodeIdentType",
+                offentligIdType = OffentligIdType.NORSK_ORGNR,
                 adresse =
                     AdresseDto(
                         adresselinje1 = "adresseLinje1",
@@ -54,7 +56,7 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
                         banknavn = "bankNavn",
                         landkodeBank = Landkode3("kodeLand"),
                         bankCode = "bankKode",
-                        valutakode = "kodeValuta",
+                        valutakode = Valutakode.NOK,
                     ),
                 erOpphørt = false,
             )
@@ -75,7 +77,7 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
                         samhandlerId = SamhandlerId("80000000003"),
                         navn = "navnSamh",
                         offentligId = "idOff",
-                        offentligIdType = "kodeIdentType",
+                        offentligIdType = OffentligIdType.NORSK_ORGNR,
                         adresse =
                             AdresseDto(
                                 adresselinje1 = "adresseLinje1",
