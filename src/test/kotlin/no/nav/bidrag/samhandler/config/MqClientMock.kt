@@ -1,6 +1,7 @@
 package no.nav.bidrag.samhandler.config
 
 import io.mockk.mockk
+import no.nav.bidrag.domene.enums.samhandler.OffentligIdType
 import no.nav.bidrag.samhandler.integration.MqClient
 import no.nav.bidrag.samhandler.service.TssService
 import no.rtv.namespacetss.AdrLinjeType
@@ -33,7 +34,7 @@ class MqClientMock : MqClient(mockk(relaxed = true), mockk(), mockk()) {
                 samhandler.add(
                     SamhandlerType().apply {
                         idOff = "idOff"
-                        kodeIdentType = "kodeIdentType"
+                        kodeIdentType = OffentligIdType.NORSK_ORGNR.name
                         navnSamh = "navnSamh"
                         kodeStatus = "GYLD"
                     },
@@ -54,7 +55,7 @@ class MqClientMock : MqClient(mockk(relaxed = true), mockk(), mockk()) {
                     AdresseSamhType().apply {
                         avdNr = "00"
                         gyldigAdresse = "J"
-                        kodeLand = "kodeLand"
+                        kodeLand = "NOR"
                         poststed = "poststed"
                         postNr = "postNr"
                         adrLinjeInfo =
@@ -76,11 +77,11 @@ class MqClientMock : MqClient(mockk(relaxed = true), mockk(), mockk()) {
                         konto.add(
                             KontoType().apply {
                                 avdNr = "00"
-                                kodeLand = "kodeLand"
+                                kodeLand = "NOR"
                                 bankNavn = "bankNavn"
                                 gironrInnland = "gironrInnland"
                                 swiftKode = "swiftKode"
-                                kodeValuta = "kodeValuta"
+                                kodeValuta = "NOK"
                                 bankKode = "bankKode"
                                 gironrUtland = "gironrUtland"
                             },

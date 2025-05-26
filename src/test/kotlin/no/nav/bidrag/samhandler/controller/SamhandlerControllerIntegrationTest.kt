@@ -46,7 +46,7 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
                         adresselinje3 = "adresseLinje3",
                         postnr = "postNr",
                         poststed = "poststed",
-                        land = Landkode3("kodeLand"),
+                        land = Landkode3("NOR"),
                     ),
                 kontonummer =
                     KontonummerDto(
@@ -54,7 +54,7 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
                         iban = "gironrUtland",
                         swift = "swiftKode",
                         banknavn = "bankNavn",
-                        landkodeBank = Landkode3("kodeLand"),
+                        landkodeBank = Landkode3("NOR"),
                         bankCode = "bankKode",
                         valutakode = Valutakode.NOK,
                     ),
@@ -85,7 +85,7 @@ class SamhandlerControllerIntegrationTest : SpringTestRunner() {
                                 adresselinje3 = "adresseLinje3",
                                 postnr = "postNr",
                                 poststed = "poststed",
-                                land = Landkode3("kodeLand"),
+                                land = Landkode3("NOR"),
                             ),
                         kontonummer = null,
                     ),
