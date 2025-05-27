@@ -1,8 +1,6 @@
 package no.nav.bidrag.samhandler.controller
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.Parameters
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -13,10 +11,8 @@ import no.nav.bidrag.samhandler.service.SamhandlerService
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerSøk
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
-import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
@@ -62,15 +58,6 @@ class SamhandlerController(
         return ResponseEntity.ok(samhandler)
     }
 
-    @GetMapping("/samhandler")
-    @Operation(
-        description = "Søker etter samhandlere basert på navn, område og postnummer",
-        security = [SecurityRequirement(name = "bearer-key")],
-    )
-    @Deprecated(message = "Søk på samhandler mot TSS.", replaceWith = ReplaceWith("/samhandlersok"))
-    fun søkSamhandler(søkSamhandlerQuery: SøkSamhandlerQuery): SamhandlersøkeresultatDto =
-        samhandlerService.søkSamhandler(søkSamhandlerQuery)
-
     @PostMapping("/samhandlersok")
     @Operation(
         description = "Søker etter samhandlere.",
@@ -100,29 +87,4 @@ class SamhandlerController(
     fun oppdaterSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> = samhandlerService.oppdaterSamhandler(samhandlerDto)
-
-    @PostMapping("/importerSamhandlerFraTss")
-    @Operation(
-        description = "Importerer samhandlere fra tss.",
-        security = [SecurityRequirement(name = "bearer-key")],
-    )
-    @Parameters(
-        value = [
-            Parameter(name = "samhandlerListe"),
-        ],
-    )
-    @Deprecated(
-        message =
-            "Dette endepunktet er opprettet for å masse-importere samhandlere fra TSS i forbindelse med prodsetting. " +
-                "Bør slettes etterpå.",
-    )
-    fun opprettSamhandlerFraListe(
-        @RequestBody samhandlerListe: SamhandlerListe,
-    ): ResponseEntity<*> = ResponseEntity.ok(samhandlerService.importerSamhandlereFraTss(samhandlerListe.samhandlere))
 }
-
-@Schema
-data class SamhandlerListe(
-    @Schema(name = "samhandlere", type = "array", example = "[\"80000000001\", \"80000000002\", \"80000000003\"]")
-    val samhandlere: List<Ident>,
-)

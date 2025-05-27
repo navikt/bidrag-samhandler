@@ -1,17 +1,9 @@
 package no.nav.bidrag.samhandler.controller
 
 import io.kotest.matchers.shouldBe
-import no.nav.bidrag.domene.enums.samhandler.OffentligIdType
-import no.nav.bidrag.domene.enums.samhandler.Valutakode
 import no.nav.bidrag.domene.ident.Ident
-import no.nav.bidrag.domene.ident.SamhandlerId
-import no.nav.bidrag.domene.land.Landkode3
 import no.nav.bidrag.samhandler.SpringTestRunner
-import no.nav.bidrag.transport.samhandler.AdresseDto
-import no.nav.bidrag.transport.samhandler.KontonummerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
-import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
-import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.kafka.test.context.EmbeddedKafka
@@ -24,78 +16,11 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 class SamhandlerControllerIntegrationTest : SpringTestRunner() {
     fun urlForPost() = rootUriComponentsBuilder().pathSegment("samhandler").build().toUri()
 
-    fun urlForGet() =
-        rootUriComponentsBuilder()
-            .pathSegment("samhandler")
-            .queryParams(SøkSamhandlerQuery("navn", "postnummer", "område").toQueryParams())
-            .build()
-            .toUri()
-
     @Test
-    fun `post for Ident retunerer korrekt bygd SamhandlerDto`() {
-        val forventetResultat =
-            SamhandlerDto(
-                samhandlerId = SamhandlerId("80000000003"),
-                navn = "navnSamh",
-                offentligId = "idOff",
-                offentligIdType = OffentligIdType.NORSK_ORGNR,
-                adresse =
-                    AdresseDto(
-                        adresselinje1 = "adresseLinje1",
-                        adresselinje2 = "adresseLinje2",
-                        adresselinje3 = "adresseLinje3",
-                        postnr = "postNr",
-                        poststed = "poststed",
-                        land = Landkode3("NOR"),
-                    ),
-                kontonummer =
-                    KontonummerDto(
-                        norskKontonummer = "gironrInnland",
-                        iban = "gironrUtland",
-                        swift = "swiftKode",
-                        banknavn = "bankNavn",
-                        landkodeBank = Landkode3("NOR"),
-                        bankCode = "bankKode",
-                        valutakode = Valutakode.NOK,
-                    ),
-                erOpphørt = false,
-            )
-
+    fun `post for Ident 204 om samhandler ikke finnes`() {
         val responseEntity =
             httpHeaderTestRestTemplate.postForEntity<SamhandlerDto>(urlForPost(), Ident("80000000003"))
 
-        responseEntity.statusCode shouldBe HttpStatus.OK
-        responseEntity.body shouldBe forventetResultat
-    }
-
-    @Test
-    fun `get for søk retunerer korrekt bygd SamhandlersøkeresultatDto`() {
-        val forventetSøkeresultat =
-            SamhandlersøkeresultatDto(
-                listOf(
-                    SamhandlerDto(
-                        samhandlerId = SamhandlerId("80000000003"),
-                        navn = "navnSamh",
-                        offentligId = "idOff",
-                        offentligIdType = OffentligIdType.NORSK_ORGNR,
-                        adresse =
-                            AdresseDto(
-                                adresselinje1 = "adresseLinje1",
-                                adresselinje2 = "adresseLinje2",
-                                adresselinje3 = "adresseLinje3",
-                                postnr = "postNr",
-                                poststed = "poststed",
-                                land = Landkode3("NOR"),
-                            ),
-                        kontonummer = null,
-                    ),
-                ),
-                flereForekomster = false,
-            )
-        val responseEntity =
-            httpHeaderTestRestTemplate.getForEntity<SamhandlersøkeresultatDto>(urlForGet().toString(), null)
-
-        responseEntity.statusCode shouldBe HttpStatus.OK
-        responseEntity.body shouldBe forventetSøkeresultat
+        responseEntity.statusCode shouldBe HttpStatus.NO_CONTENT
     }
 }

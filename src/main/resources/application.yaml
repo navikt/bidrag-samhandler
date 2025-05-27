@@ -15,17 +15,6 @@ no.nav.security.jwt:
     discovery_url: https://login.microsoftonline.com/${AZURE_APP_TENANT_ID}/v2.0/.well-known/openid-configuration
     accepted_audience: ${AZURE_APP_CLIENT_ID}, api://${AZURE_APP_CLIENT_ID}
 
-ibm:
-  mq:
-    queueManager: ${MQ_QUEUE_MANAGER}
-    channel: ${MQ_CHANNEL}
-    connName: ${MQ_CONN_NAME}
-    user: srvbidrag-samhandler
-    password: ${MQ_PASSWORD}
-    application-name: BIDRAG-SAMHANDLER
-    tssRequestQueue: ${MQ_TSS_REQUEST_QUEUE}
-    use-authentication-m-q-c-s-p: true
-
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource

@@ -6,15 +6,6 @@ AZURE_APP_CLIENT_SECRET: unset
 server.port: 8999
 TOPIC_SAMHANDLER: bidrag.samhandler-test
 NAIS_APP_NAME: bidrag-samhandler
-ibm:
-  mq:
-    queueManager: QM1
-    channel: DEV.ADMIN.SVRCONN
-    connName: localhost(1414)
-    user: admin
-    password: passw0rd
-    application-name: bidrag-samhandler
-    tssRequestQueue: DEV.QUEUE.1
 
 spring:
   flyway:

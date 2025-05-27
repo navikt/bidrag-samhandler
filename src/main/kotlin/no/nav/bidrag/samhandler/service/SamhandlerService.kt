@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager
 import no.nav.bidrag.commons.security.utils.TokenUtils
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.samhandler.SECURE_LOGGER
-import no.nav.bidrag.samhandler.exception.SamhandlerNotFoundException
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
@@ -12,7 +11,6 @@ import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerKafkaHendelsestype
 import no.nav.bidrag.transport.samhandler.SamhandlerSøk
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
-import no.nav.bidrag.transport.samhandler.SøkSamhandlerQuery
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
@@ -21,7 +19,6 @@ import kotlin.jvm.optionals.getOrNull
 
 @Service
 class SamhandlerService(
-    private val tssService: TssService,
     private val samhandlerRepository: SamhandlerRepository,
     private val kafkaService: KafkaService,
     private val entityManager: EntityManager,
@@ -31,39 +28,10 @@ class SamhandlerService(
         ident: Ident,
         inkluderAuditLog: Boolean,
     ): SamhandlerDto? {
-        val samhandler = samhandlerRepository.findByIdent(ident.verdi)
-        if (samhandler != null) {
+        samhandlerRepository.findByIdent(ident.verdi)?.let { samhandler ->
             return SamhandlerMapper.mapTilSamhandlerDto(samhandler, inkluderAuditLog)
         }
-
-        val hentetSamhandler = tssService.hentSamhandler(ident)
-        hentetSamhandler?.let {
-            val mapTilSamhandler = SamhandlerMapper.mapTilSamhandler(hentetSamhandler, true, hentetSamhandler.erOpphørt ?: false)
-            val opprettetSamhandler = samhandlerRepository.save(mapTilSamhandler)
-            entityManager.refresh(opprettetSamhandler)
-            kafkaService.sendSamhandlerMelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
-        }
-        return hentetSamhandler
-    }
-
-    @Deprecated(
-        "Søker mot tss med gammel query.",
-        replaceWith = ReplaceWith("samhandlerService.samhandlerSøk(samhandlerSøk)"),
-    )
-    fun søkSamhandler(søkSamhandlerQuery: SøkSamhandlerQuery): SamhandlersøkeresultatDto {
-        val samhandlere =
-            søkSamhandlerQuery.postnummer?.let {
-                samhandlerRepository.findAllByNavnIgnoreCaseAndPostnr(
-                    søkSamhandlerQuery.navn,
-                    søkSamhandlerQuery.postnummer,
-                )
-            }
-                ?: samhandlerRepository.findAllByNavnIgnoreCase(søkSamhandlerQuery.navn)
-
-        if (samhandlere.isNotEmpty()) {
-            return SamhandlerMapper.mapTilSamhandlersøkeresultatDto(samhandlere)
-        }
-        return tssService.søkSamhandler(søkSamhandlerQuery)
+        return null
     }
 
     fun samhandlerSøk(samhandlerSøk: SamhandlerSøk): SamhandlersøkeresultatDto {
@@ -93,23 +61,6 @@ class SamhandlerService(
         return opprettetSamhandler.id!!
     }
 
-    @Deprecated(
-        message =
-            "Dette endepunktet er opprettet for å masse-importere samhandlere fra TSS i forbindelse med prodsetting. " +
-                "Bør slettes etterpå.",
-        replaceWith = ReplaceWith("samhandlere.forEach { hentSamhandler(it, false) }"),
-    )
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun importerSamhandlereFraTss(samhandlere: List<Ident>) {
-        try {
-            samhandlere.forEach {
-                hentSamhandler(it, false)
-            }
-        } catch (e: SamhandlerNotFoundException) {
-            SECURE_LOGGER.error("Feil ved import av samhandlere fra TSS: {}", e.message)
-        }
-    }
-
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun hentSamhandlerPåId(samhandlerId: Int) =
         samhandlerRepository.findById(samhandlerId).getOrNull()?.let {
@@ -130,7 +81,7 @@ class SamhandlerService(
                 navn =
                     samhandlerDto.navn ?: return ResponseEntity
                         .badRequest()
-                        .body("Navn kan ikke være tomt! Mangler navn fra TSS må dette opprettes."),
+                        .body("Navn kan ikke være tomt!"),
                 offentligId = samhandlerDto.offentligId,
                 offentligIdType = samhandlerDto.offentligIdType,
                 områdekode = samhandlerDto.områdekode,

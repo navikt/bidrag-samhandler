@@ -22,9 +22,6 @@ import java.util.Optional
 @ExtendWith(MockKExtension::class)
 class SamhandlerServiceTest {
     @RelaxedMockK
-    private lateinit var tssService: TssService
-
-    @RelaxedMockK
     private lateinit var samhandlerRepository: SamhandlerRepository
 
     @RelaxedMockK
@@ -53,18 +50,6 @@ class SamhandlerServiceTest {
         val result = samhandlerService.hentSamhandler(ident, true)
         result shouldNotBe null
         verify { samhandlerRepository.findByIdent(ident.verdi) }
-    }
-
-    @Test
-    fun `hentSamhandler skal returnere null når samhandler ikke finnes`() {
-        every { samhandlerRepository.findByIdent(ident.verdi) } returns null
-        every { tssService.hentSamhandler(ident) } returns null
-
-        val result = samhandlerService.hentSamhandler(ident, true)
-
-        result shouldBe null
-        verify { samhandlerRepository.findByIdent(ident.verdi) }
-        verify { tssService.hentSamhandler(ident) }
     }
 
     @Test
@@ -110,7 +95,10 @@ class SamhandlerServiceTest {
         val invalidSamhandlerDto = samhandlerDto.copy(navn = null)
         every { samhandlerRepository.save(any()) } returns samhandler
         val result = samhandlerService.oppdaterSamhandler(invalidSamhandlerDto)
-        result shouldBe ResponseEntity.badRequest().body("Navn kan ikke være tomt! Mangler navn fra TSS må dette opprettes.")
+        result shouldBe
+            ResponseEntity
+                .badRequest()
+                .body("Navn kan ikke være tomt!")
     }
 
     @Test
