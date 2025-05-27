@@ -75,6 +75,7 @@ class SamhandlerController(
     fun opprettSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> {
+        samhandlerService.validerInput(samhandlerDto)?.let { return it }
         val samhandlerId = samhandlerService.opprettSamhandler(samhandlerDto)
         return ResponseEntity.ok(samhandlerService.hentSamhandlerPåId(samhandlerId))
     }
@@ -86,5 +87,8 @@ class SamhandlerController(
     )
     fun oppdaterSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
-    ): ResponseEntity<*> = samhandlerService.oppdaterSamhandler(samhandlerDto)
+    ): ResponseEntity<*> {
+        samhandlerService.validerInput(samhandlerDto)?.let { return it }
+        return samhandlerService.oppdaterSamhandler(samhandlerDto)
+    }
 }

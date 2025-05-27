@@ -6,13 +6,23 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import io.mockk.verify
 import jakarta.persistence.EntityManager
+import no.nav.bidrag.domene.enums.diverse.Språk
+import no.nav.bidrag.domene.enums.samhandler.OffentligIdType
+import no.nav.bidrag.domene.enums.samhandler.Valutakode
 import no.nav.bidrag.domene.ident.Ident
+import no.nav.bidrag.domene.land.Landkode3
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.persistence.entity.Samhandler
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
+import no.nav.bidrag.samhandler.util.KontonummerUtils
+import no.nav.bidrag.transport.samhandler.AdresseDto
+import no.nav.bidrag.transport.samhandler.KontonummerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -40,8 +50,16 @@ class SamhandlerServiceTest {
     @BeforeEach
     fun setUp() {
         ident = Ident("12345678901")
-        samhandler = Samhandler(id = 0, ident = "12345678901")
+        samhandler =
+            Samhandler(
+                id = 0,
+                ident = "12345678901",
+                offentligId = "12345678901",
+                offentligIdType = OffentligIdType.ORG,
+                navn = "Test Samhandler",
+            )
         samhandlerDto = SamhandlerMapper.mapTilSamhandlerDto(samhandler)
+        mockkObject(KontonummerUtils)
     }
 
     @Test
@@ -91,21 +109,206 @@ class SamhandlerServiceTest {
     }
 
     @Test
-    fun `oppdaterSamhandler skal returnere ResponseEntity med bad request when navn ikke er satt`() {
-        val invalidSamhandlerDto = samhandlerDto.copy(navn = null)
-        every { samhandlerRepository.save(any()) } returns samhandler
-        val result = samhandlerService.oppdaterSamhandler(invalidSamhandlerDto)
-        result shouldBe
-            ResponseEntity
-                .badRequest()
-                .body("Navn kan ikke være tomt!")
-    }
-
-    @Test
     fun `oppdaterSamhandler skal oppdatere og returnere ResponseEntity med SamhandlerDto`() {
         every { samhandlerRepository.save(any()) } returns samhandler
         every { samhandlerRepository.findByIdent(samhandlerDto.samhandlerId!!.verdi) } returns samhandler
         val result = samhandlerService.oppdaterSamhandler(samhandlerDto)
         result shouldBe ResponseEntity.ok(SamhandlerMapper.mapTilSamhandlerDto(samhandler))
+    }
+
+    @Test
+    fun `validerInput returnerer bad request om adresselinje 2 eller 3 er fylt ut før 1`() {
+        val adresse =
+            AdresseDto(
+                adresselinje1 = null,
+                adresselinje2 = "Linje2",
+                adresselinje3 = null,
+                postnr = null,
+                poststed = null,
+                land = null,
+            )
+        val dto = samhandlerDto.copy(adresse = adresse, språk = Språk.NB)
+        val result = samhandlerService.validerInput(dto)
+        result shouldBe
+            ResponseEntity
+                .badRequest()
+                .body("Adresselinje1 må fylles ut før adresselinje 2 eller adresselinje 3.")
+    }
+
+    @Test
+    fun `validerInput returnerer bad request om landkode for adresse mangler`() {
+        val adresse =
+            AdresseDto(
+                adresselinje1 = "Linje1",
+                adresselinje2 = null,
+                adresselinje3 = null,
+                postnr = null,
+                poststed = null,
+                land = null,
+            )
+        val dto = samhandlerDto.copy(adresse = adresse, språk = Språk.NB)
+        val result = samhandlerService.validerInput(dto)
+        result shouldBe ResponseEntity.badRequest().body("Landkode med 3 tegn må angis for adresse.")
+    }
+
+    @Test
+    fun `validerInput returnerer bad request om landkode for adresse ugylid`() {
+        val adresse =
+            AdresseDto(
+                adresselinje1 = "Linje1",
+                adresselinje2 = null,
+                adresselinje3 = null,
+                postnr = null,
+                poststed = null,
+                land = Landkode3(""),
+            )
+        val dto = samhandlerDto.copy(adresse = adresse, språk = Språk.NB)
+        val result = samhandlerService.validerInput(dto)
+        result shouldBe ResponseEntity.badRequest().body("Landkode med 3 tegn må angis for adresse.")
+    }
+
+    @Test
+    fun `validerInput returnerer bad request om norsk adresse mangler postnr eller poststed`() {
+        val adresse =
+            AdresseDto(
+                adresselinje1 = "Linje1",
+                adresselinje2 = null,
+                adresselinje3 = null,
+                postnr = null,
+                poststed = null,
+                land = Landkode3("NOR"),
+            )
+        val dto = samhandlerDto.copy(adresse = adresse, språk = Språk.NB)
+        val result = samhandlerService.validerInput(dto)
+        result shouldBe ResponseEntity.badRequest().body("Postnummer og poststed må angis for norske adresser.")
+    }
+
+    @Test
+    fun `validerInput returnerer bad request om kontonummer er for kort`() {
+        val kontonummer =
+            KontonummerDto(
+                norskKontonummer = "123",
+                iban = null,
+                swift = null,
+                banknavn = null,
+                landkodeBank = null,
+                valutakode = Valutakode.NOK,
+                bankCode = null,
+            )
+        val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
+        val result = samhandlerService.validerInput(dto)
+        result shouldBe ResponseEntity.badRequest().body("Norsk kontonummer må være 11 tegn langt.")
+    }
+
+    @Test
+    fun `validerInput returnerer bad request om kontonummer er på feil format`() {
+        val kontonummer =
+            KontonummerDto(
+                norskKontonummer = "12345678901",
+                iban = null,
+                swift = null,
+                banknavn = null,
+                landkodeBank = null,
+                valutakode = Valutakode.NOK,
+                bankCode = null,
+            )
+        every { KontonummerUtils.erGyldigKontonummerMod11("12345678901") } returns false
+        val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
+        val result = samhandlerService.validerInput(dto)
+        result shouldBe ResponseEntity.badRequest().body("Det er angitt et ugyldig norsk kontonummer.")
+    }
+
+    @Test
+    fun `validerInput returnerer bad request om valutakode mangler`() {
+        val kontonummer =
+            KontonummerDto(
+                norskKontonummer = "12345678901",
+                iban = null,
+                swift = null,
+                banknavn = null,
+                landkodeBank = null,
+                valutakode = null,
+                bankCode = null,
+            )
+        every { KontonummerUtils.erGyldigKontonummerMod11("12345678901") } returns true
+        val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
+        val result = samhandlerService.validerInput(dto)
+        result shouldBe ResponseEntity.badRequest().body("Valutakode må angis.")
+    }
+
+    @Test
+    fun `validerInput returnerer bad request om landkodeBank er uglydig`() {
+        val kontonummer =
+            KontonummerDto(
+                norskKontonummer = null,
+                iban = null,
+                swift = null,
+                banknavn = null,
+                landkodeBank = Landkode3("NO"),
+                valutakode = Valutakode.NOK,
+                bankCode = null,
+            )
+        val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
+        val result = samhandlerService.validerInput(dto)
+        result shouldBe ResponseEntity.badRequest().body("Landkode for bank NO må ha 3 tegn.")
+    }
+
+    @Test
+    fun `validerInput returnerer bad request om alle kontonummer felt er blanke`() {
+        val kontonummer =
+            KontonummerDto(
+                norskKontonummer = null,
+                iban = null,
+                swift = null,
+                banknavn = null,
+                landkodeBank = null,
+                valutakode = Valutakode.NOK,
+                bankCode = null,
+            )
+        val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
+        val result = samhandlerService.validerInput(dto)
+        result shouldBe
+            ResponseEntity
+                .badRequest()
+                .body("Samhandleren må ha kontonummeropplysninger. Fyll inn enten norsk eller utenlandsk kontoinformasjon.")
+    }
+
+    @Test
+    fun `validerInput returnerer bad request om språk er null`() {
+        val dto = samhandlerDto.copy(språk = null, kontonummer = KontonummerDto(iban = "123", valutakode = Valutakode.NOK))
+        val result = samhandlerService.validerInput(dto)
+        result shouldBe ResponseEntity.badRequest().body("Språk må angis.")
+    }
+
+    @Test
+    fun `validerInput returnerer null om alt er gydlig`() {
+        val adresse =
+            AdresseDto(
+                adresselinje1 = "Linje1",
+                adresselinje2 = null,
+                adresselinje3 = null,
+                postnr = "1234",
+                poststed = "Oslo",
+                land = Landkode3("NOR"),
+            )
+        val kontonummer =
+            KontonummerDto(
+                norskKontonummer = "12345678901",
+                iban = null,
+                swift = null,
+                banknavn = null,
+                landkodeBank = Landkode3("NOR"),
+                valutakode = Valutakode.NOK,
+                bankCode = null,
+            )
+        every { KontonummerUtils.erGyldigKontonummerMod11("12345678901") } returns true
+        val dto = samhandlerDto.copy(adresse = adresse, kontonummer = kontonummer, språk = Språk.NB)
+        val result = samhandlerService.validerInput(dto)
+        result shouldBe null
+    }
+
+    @AfterEach
+    fun tearDown() {
+        unmockkAll()
     }
 }
