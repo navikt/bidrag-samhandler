@@ -24,10 +24,6 @@ spec:
       rules:
        - application: logging
          namespace: nais-system
-      external:
-        - host: {{env.MQ_HOST}}
-          ports:
-            - port: {{env.MQ_PORT}}
     inbound:
       rules:
       {{#each azure_access_inbound}}
@@ -64,8 +60,6 @@ spec:
     disableAutoScaling: true
     max: {{replicas.max}}
     min: {{replicas.min}}
-  envFrom:
-    - secret: bidrag-samhandler-mq-password
   gcp:
     sqlInstances:
       - name: {{ database.navn }}
