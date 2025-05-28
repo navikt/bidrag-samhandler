@@ -71,7 +71,7 @@ object SamhandlerMapper {
     ): Samhandler =
         Samhandler(
             ident = samhandlerDto.samhandlerId?.verdi,
-            navn = samhandlerDto.navn ?: error("Samhandler kan ikke opprettes uten navn."),
+            navn = samhandlerDto.navn,
             offentligId = samhandlerDto.offentligId,
             offentligIdType = samhandlerDto.offentligIdType,
             språk = samhandlerDto.språk,
