@@ -23,7 +23,7 @@
 		<jakarta.xml.ws-api.version>4.0.1</jakarta.xml.ws-api.version>
 		<jaxws.version>4.0.3</jaxws.version>
 		<mockk.version>1.13.17</mockk.version>
-		<kotlin-logging-jvm.version>7.0.5</kotlin-logging-jvm.version>
+		<kotlin-logging-jvm.version>7.0.7</kotlin-logging-jvm.version>
 		<ktlint.version>1.6.0</ktlint.version>
 		<hypersistence-utils-hibernate.version>3.9.5</hypersistence-utils-hibernate.version>
 		<spring-cloud-contract-wiremock.version>4.2.0</spring-cloud-contract-wiremock.version>
