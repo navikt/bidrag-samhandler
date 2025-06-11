@@ -15,8 +15,8 @@
 	<properties>
 		<java.version>21</java.version>
 		<kotlin.version>2.1.21</kotlin.version>
-		<bidrag-felles.version>2025.06.05.093139</bidrag-felles.version>
-		<logback-encoder.version>8.0</logback-encoder.version>
+		<bidrag-felles.version>2025.06.11.101752</bidrag-felles.version>
+		<logback-encoder.version>8.1</logback-encoder.version>
 		<springdoc-openapi-ui.version>2.8.8</springdoc-openapi-ui.version>
 		<token-support.version>5.0.29</token-support.version>
 		<kotest.version>5.9.1</kotest.version>
@@ -25,8 +25,8 @@
 		<mockk.version>1.13.17</mockk.version>
 		<kotlin-logging-jvm.version>7.0.7</kotlin-logging-jvm.version>
 		<ktlint.version>1.6.0</ktlint.version>
-		<hypersistence-utils-hibernate.version>3.9.5</hypersistence-utils-hibernate.version>
-		<spring-cloud-contract-wiremock.version>4.2.0</spring-cloud-contract-wiremock.version>
+		<hypersistence-utils-hibernate.version>3.9.11</hypersistence-utils-hibernate.version>
+		<spring-cloud-contract-wiremock.version>4.3.0</spring-cloud-contract-wiremock.version>
 	</properties>
 
 	<repositories>
@@ -46,7 +46,7 @@
 			<dependency>
 				<groupId>com.fasterxml.woodstox</groupId>
 				<artifactId>woodstox-core</artifactId>
-				<version>7.1.0</version>
+				<version>7.1.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
