@@ -22,7 +22,7 @@
 		<kotest.version>5.9.1</kotest.version>
 		<jakarta.xml.ws-api.version>4.0.1</jakarta.xml.ws-api.version>
 		<jaxws.version>4.0.3</jaxws.version>
-		<mockk.version>1.13.17</mockk.version>
+		<mockk.version>1.14.2</mockk.version>
 		<kotlin-logging-jvm.version>7.0.7</kotlin-logging-jvm.version>
 		<ktlint.version>1.6.0</ktlint.version>
 		<hypersistence-utils-hibernate.version>3.9.11</hypersistence-utils-hibernate.version>
