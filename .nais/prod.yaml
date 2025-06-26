@@ -36,4 +36,7 @@ azure_access_inbound:
     cluster: prod-gcp
   - application: bidrag-dokument-forsendelse
     namespace: bidrag
-    cluster: dev-gcp
+    cluster: prod-gcp
+  - application: bidrag-behandling
+    namespace: bidrag
+    cluster: prod-gcp
