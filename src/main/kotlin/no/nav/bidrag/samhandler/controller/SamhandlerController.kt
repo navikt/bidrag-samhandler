@@ -7,18 +7,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.nav.bidrag.domene.ident.Ident
+import no.nav.bidrag.samhandler.model.SamhandlerValideringsfeil
 import no.nav.bidrag.samhandler.service.SamhandlerService
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerSøk
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
-import no.nav.security.token.support.core.api.Protected
+import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@Protected
+@Unprotected
 class SamhandlerController(
     private val samhandlerService: SamhandlerService,
 ) {
@@ -72,14 +73,27 @@ class SamhandlerController(
         description = "Oppretter samhandler.",
         security = [SecurityRequirement(name = "bearer-key")],
     )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Validering av grunnlag feilet for beregning",
+                content = [
+                    Content(
+                        schema = Schema(implementation = SamhandlerValideringsfeil::class),
+                    ),
+                ],
+            ),
+        ],
+    )
     fun opprettSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> {
-        samhandlerService.validerInput(samhandlerDto)?.let { return it }
-        val samhandlerIdInput = samhandlerDto.samhandlerId
-        if (samhandlerIdInput != null && samhandlerIdInput.verdi.isNotEmpty()) {
-            return ResponseEntity.badRequest().body("Kan ikke sette samhandlerId ved opprettelse av samhandler.")
-        }
+        samhandlerService.validerInput(samhandlerDto)
+
         val samhandlerId = samhandlerService.opprettSamhandler(samhandlerDto)
         return ResponseEntity.ok(samhandlerService.hentSamhandlerPåId(samhandlerId))
     }
@@ -92,7 +106,7 @@ class SamhandlerController(
     fun oppdaterSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> {
-        samhandlerService.validerInput(samhandlerDto)?.let { return it }
+        samhandlerService.validerInput(samhandlerDto)
         return samhandlerService.oppdaterSamhandler(samhandlerDto)
     }
 }
