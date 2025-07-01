@@ -9,6 +9,7 @@ import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
 import no.nav.bidrag.samhandler.util.KontonummerUtils
+import no.nav.bidrag.samhandler.util.nullIfEmpty
 import no.nav.bidrag.transport.samhandler.AdresseDto
 import no.nav.bidrag.transport.samhandler.KontonummerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
@@ -88,23 +89,31 @@ class SamhandlerService(
                 offentligIdType = samhandlerDto.offentligIdType,
                 områdekode = samhandlerDto.områdekode,
                 språk = samhandlerDto.språk,
-                norskkontonr = samhandlerDto.kontonummer?.norskKontonummer,
-                iban = samhandlerDto.kontonummer?.iban,
-                swift = samhandlerDto.kontonummer?.swift,
-                banknavn = samhandlerDto.kontonummer?.banknavn,
-                banklandkode = samhandlerDto.kontonummer?.landkodeBank?.verdi,
+                norskkontonr = samhandlerDto.kontonummer?.norskKontonummer.nullIfEmpty(),
+                iban = samhandlerDto.kontonummer?.iban.nullIfEmpty(),
+                swift = samhandlerDto.kontonummer?.swift.nullIfEmpty(),
+                banknavn = samhandlerDto.kontonummer?.banknavn.nullIfEmpty(),
+                banklandkode =
+                    samhandlerDto.kontonummer
+                        ?.landkodeBank
+                        ?.verdi
+                        .nullIfEmpty(),
                 valutakode = samhandlerDto.kontonummer?.valutakode,
-                bankcode = samhandlerDto.kontonummer?.bankCode,
-                adresselinje1 = samhandlerDto.adresse?.adresselinje1,
-                adresselinje2 = samhandlerDto.adresse?.adresselinje2,
-                adresselinje3 = samhandlerDto.adresse?.adresselinje3,
-                postnr = samhandlerDto.adresse?.postnr,
-                poststed = samhandlerDto.adresse?.poststed,
-                land = samhandlerDto.adresse?.land?.verdi,
-                kontaktperson = samhandlerDto.kontaktperson,
-                kontaktEpost = samhandlerDto.kontaktEpost,
-                kontaktTelefon = samhandlerDto.kontaktTelefon,
-                notat = samhandlerDto.notat,
+                bankcode = samhandlerDto.kontonummer?.bankCode.nullIfEmpty(),
+                adresselinje1 = samhandlerDto.adresse?.adresselinje1.nullIfEmpty(),
+                adresselinje2 = samhandlerDto.adresse?.adresselinje2.nullIfEmpty(),
+                adresselinje3 = samhandlerDto.adresse?.adresselinje3.nullIfEmpty(),
+                postnr = samhandlerDto.adresse?.postnr.nullIfEmpty(),
+                poststed = samhandlerDto.adresse?.poststed.nullIfEmpty(),
+                land =
+                    samhandlerDto.adresse
+                        ?.land
+                        ?.verdi
+                        .nullIfEmpty(),
+                kontaktperson = samhandlerDto.kontaktperson.nullIfEmpty(),
+                kontaktEpost = samhandlerDto.kontaktEpost.nullIfEmpty(),
+                kontaktTelefon = samhandlerDto.kontaktTelefon.nullIfEmpty(),
+                notat = samhandlerDto.notat.nullIfEmpty(),
                 erOpphørt = samhandlerDto.erOpphørt ?: false,
             )
 
