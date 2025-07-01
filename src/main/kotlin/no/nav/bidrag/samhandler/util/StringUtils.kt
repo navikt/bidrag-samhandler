@@ -1,3 +1,3 @@
 package no.nav.bidrag.samhandler.util
 
-fun String?.nullIfEmpty() = if (this.isNullOrEmpty()) null else this
+fun String?.nullIfEmpty() = if (this?.trim().isNullOrEmpty()) null else this
