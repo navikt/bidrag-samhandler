@@ -76,6 +76,10 @@ class SamhandlerController(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> {
         samhandlerService.validerInput(samhandlerDto)?.let { return it }
+        val samhandlerIdInput = samhandlerDto.samhandlerId
+        if (samhandlerIdInput != null && samhandlerIdInput.verdi.isNotEmpty()) {
+            return ResponseEntity.badRequest().body("Kan ikke sette samhandlerId ved opprettelse av samhandler.")
+        }
         val samhandlerId = samhandlerService.opprettSamhandler(samhandlerDto)
         return ResponseEntity.ok(samhandlerService.hentSamhandlerPåId(samhandlerId))
     }
