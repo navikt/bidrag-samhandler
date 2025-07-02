@@ -104,16 +104,14 @@ class SamhandlerService(
         if (identtiskeSamhandlere.isNotEmpty()) {
             throw ConflictException(
                 "Feil ved opprettelse av samhandler: Samhandler med samme offentlig ID og kontonummer finnes fra før.",
-                commonObjectmapper.writeValueAsBytes(
-                    SamhandlerValideringsfeil(
-                        identtiskeSamhandlere.entries.first().let { (samhandlerId, felter) ->
-                            DuplikatSamhandler(
-                                "Samhandler med samme offentlig ID og kontonummer finnes fra før",
-                                samhandlerId,
-                                felter,
-                            )
-                        },
-                    ),
+                SamhandlerValideringsfeil(
+                    identtiskeSamhandlere.entries.first().let { (samhandlerId, felter) ->
+                        DuplikatSamhandler(
+                            "Samhandler med samme offentlig ID og kontonummer finnes fra før",
+                            samhandlerId,
+                            felter,
+                        )
+                    },
                 ),
             )
         }
