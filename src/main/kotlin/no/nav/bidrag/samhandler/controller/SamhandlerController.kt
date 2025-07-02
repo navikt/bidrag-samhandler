@@ -79,8 +79,17 @@ class SamhandlerController(
                 responseCode = "200",
             ),
             ApiResponse(
+                responseCode = "409",
+                description = "Det finnes en identisk samhandler fra før.",
+                content = [
+                    Content(
+                        schema = Schema(implementation = SamhandlerValideringsfeil::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
                 responseCode = "400",
-                description = "Validering av grunnlag feilet for beregning",
+                description = "Validering av samhandlerDto feilet",
                 content = [
                     Content(
                         schema = Schema(implementation = SamhandlerValideringsfeil::class),
@@ -102,6 +111,22 @@ class SamhandlerController(
     @Operation(
         description = "Oppdaterer samhandler.",
         security = [SecurityRequirement(name = "bearer-key")],
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Validering av samhandlerDto feilet",
+                content = [
+                    Content(
+                        schema = Schema(implementation = SamhandlerValideringsfeil::class),
+                    ),
+                ],
+            ),
+        ],
     )
     fun oppdaterSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,

@@ -14,8 +14,10 @@ import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
 import no.nav.bidrag.samhandler.util.ConflictException
 import no.nav.bidrag.samhandler.util.DuplikatSamhandlerMap
 import no.nav.bidrag.samhandler.util.KontonummerUtils
+import no.nav.bidrag.samhandler.util.ValideringMap
 import no.nav.bidrag.samhandler.util.add
 import no.nav.bidrag.samhandler.util.getPath
+import no.nav.bidrag.samhandler.util.leggTil
 import no.nav.bidrag.samhandler.util.nullIfEmpty
 import no.nav.bidrag.transport.felles.commonObjectmapper
 import no.nav.bidrag.transport.samhandler.AdresseDto
@@ -126,9 +128,17 @@ class SamhandlerService(
     @Transactional
     fun oppdaterSamhandler(samhandlerDto: SamhandlerDto): ResponseEntity<*> {
         val samhandlerIdent =
-            samhandlerDto.samhandlerId?.verdi ?: return ResponseEntity
-                .badRequest()
-                .body("Oppdatering av samhandler må ha angitt samhandlerId!")
+            samhandlerDto.samhandlerId?.verdi
+                ?: throw HttpClientErrorException(
+                    HttpStatus.BAD_REQUEST,
+                    "Oppdatering av samhandler må ha angitt samhandlerId!",
+                    commonObjectmapper.writeValueAsBytes(
+                        SamhandlerValideringsfeil(
+                            ugyldigInput = mapOf(SamhandlerDto::samhandlerId.name to "SamhandlerId må angis ved oppdatering av samhandler"),
+                        ),
+                    ),
+                    Charset.defaultCharset(),
+                )
         val samhandler =
             samhandlerRepository.findByIdent(samhandlerIdent) ?: return ResponseEntity.notFound().build<Any>()
 
@@ -185,7 +195,7 @@ class SamhandlerService(
         samhandlerDto: SamhandlerDto,
         opprettSamhandler: Boolean = false,
     ) {
-        val valideringsfeil: MutableMap<String, String> = mutableMapOf()
+        val valideringsfeil: ValideringMap = mutableMapOf()
         if (samhandlerDto.adresse != null) {
             validerAdresse(samhandlerDto.adresse!!, valideringsfeil)
         }
@@ -193,14 +203,14 @@ class SamhandlerService(
             validerKontonummer(samhandlerDto.kontonummer!!, valideringsfeil)
         }
         if (samhandlerDto.språk == null) {
-            valideringsfeil.put(
+            valideringsfeil.leggTil(
                 getPath(SamhandlerDto::språk),
                 "Språk må angis.",
             )
         }
         val samhandlerIdInput = samhandlerDto.samhandlerId
         if (opprettSamhandler && samhandlerIdInput != null && samhandlerIdInput.verdi.isNotEmpty()) {
-            valideringsfeil.put(
+            valideringsfeil.leggTil(
                 getPath(SamhandlerDto::samhandlerId),
                 "Kan ikke sette samhandlerId ved opprettelse av samhandler.",
             )
@@ -221,30 +231,30 @@ class SamhandlerService(
 
     private fun validerKontonummer(
         kontonummer: KontonummerDto,
-        valideringsfeil: MutableMap<String, String>,
+        valideringsfeil: ValideringMap,
     ) {
         if (kontonummer.norskKontonummer?.isNotEmpty() == true) {
             if (kontonummer.norskKontonummer?.length != 11) {
-                valideringsfeil.put(
+                valideringsfeil.leggTil(
                     getPath(SamhandlerDto::kontonummer, KontonummerDto::norskKontonummer),
                     "Norsk kontonummer må være 11 tegn langt.",
                 )
             }
             if (!KontonummerUtils.erGyldigKontonummerMod11(kontonummer.norskKontonummer!!)) {
-                valideringsfeil.put(
+                valideringsfeil.leggTil(
                     getPath(SamhandlerDto::kontonummer, KontonummerDto::norskKontonummer),
                     "Det er angitt et ugyldig norsk kontonummer.",
                 )
             }
         }
         if (kontonummer.valutakode == null) {
-            valideringsfeil.put(
+            valideringsfeil.leggTil(
                 getPath(SamhandlerDto::kontonummer, KontonummerDto::valutakode),
                 "Valutakode må angis.",
             )
         }
         if (kontonummer.landkodeBank != null && kontonummer.landkodeBank?.gyldig() == false) {
-            valideringsfeil.put(
+            valideringsfeil.leggTil(
                 getPath(SamhandlerDto::kontonummer, KontonummerDto::landkodeBank),
                 "Landkode for bank ${kontonummer.landkodeBank?.verdi} må ha 3 tegn.",
             )
@@ -253,11 +263,11 @@ class SamhandlerService(
             kontonummer.iban.isNullOrBlank() &&
             kontonummer.swift.isNullOrBlank()
         ) {
-            valideringsfeil.put(
+            valideringsfeil.leggTil(
                 getPath(SamhandlerDto::kontonummer, KontonummerDto::norskKontonummer),
                 "Samhandleren må ha kontonummeropplysninger. Fyll inn enten norsk eller utenlandsk kontoinformasjon.",
             )
-            valideringsfeil.put(
+            valideringsfeil.leggTil(
                 getPath(SamhandlerDto::kontonummer, KontonummerDto::iban),
                 "Samhandleren må ha kontonummeropplysninger. Fyll inn enten norsk eller utenlandsk kontoinformasjon.",
             )
@@ -266,7 +276,7 @@ class SamhandlerService(
 
     private fun validerAdresse(
         adresse: AdresseDto,
-        valideringsfeil: MutableMap<String, String>,
+        valideringsfeil: ValideringMap,
     ) {
         if (adresse.adresselinje1.isNullOrBlank() &&
             (
@@ -274,30 +284,30 @@ class SamhandlerService(
                     adresse.adresselinje3?.isNotEmpty() == true
             )
         ) {
-            valideringsfeil.put(
+            valideringsfeil.leggTil(
                 getPath(SamhandlerDto::adresse, AdresseDto::adresselinje1),
                 "Adresselinje1 må fylles ut før adresselinje 2 eller adresselinje 3.",
             )
         }
         if (adresse.adresselinje1?.isNotEmpty() == true) {
             if (adresse.land?.verdi.isNullOrBlank()) {
-                valideringsfeil.put(
+                valideringsfeil.leggTil(
                     getPath(SamhandlerDto::adresse, AdresseDto::land),
                     "Landkode med 3 tegn må angis for adresse.",
                 )
             }
             if (adresse.land?.gyldig() == false) {
-                valideringsfeil.put(
+                valideringsfeil.leggTil(
                     getPath(SamhandlerDto::adresse, AdresseDto::land),
                     "Landkode ${adresse.land?.verdi} må ha 3 tegn, og kan ikke være blank.",
                 )
             }
             if (adresse.land?.equals(Landkode3("NOR")) == true && (adresse.postnr.isNullOrBlank() || adresse.poststed.isNullOrBlank())) {
-                valideringsfeil.put(
+                valideringsfeil.leggTil(
                     getPath(SamhandlerDto::adresse, AdresseDto::postnr),
                     "Postnummer og poststed må angis for norske adresser.",
                 )
-                valideringsfeil.put(
+                valideringsfeil.leggTil(
                     getPath(SamhandlerDto::adresse, AdresseDto::poststed),
                     "Postnummer og poststed må angis for norske adresser.",
                 )
