@@ -1,5 +1,3 @@
-@file:Suppress("ktlint:standard:filename")
-
 package no.nav.bidrag.samhandler.model
 
 data class SamhandlerValideringsfeil(

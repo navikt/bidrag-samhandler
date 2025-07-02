@@ -2,6 +2,7 @@ package no.nav.bidrag.samhandler.service
 
 import jakarta.persistence.EntityManager
 import no.nav.bidrag.commons.security.utils.TokenUtils
+import no.nav.bidrag.commons.util.secureLogger
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.domene.land.Landkode3
 import no.nav.bidrag.samhandler.SECURE_LOGGER
@@ -10,6 +11,7 @@ import no.nav.bidrag.samhandler.model.DuplikatSamhandler
 import no.nav.bidrag.samhandler.model.SamhandlerValideringsfeil
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
+import no.nav.bidrag.samhandler.util.ConflictException
 import no.nav.bidrag.samhandler.util.DuplikatSamhandlerMap
 import no.nav.bidrag.samhandler.util.KontonummerUtils
 import no.nav.bidrag.samhandler.util.add
@@ -22,6 +24,8 @@ import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerKafkaHendelsestype
 import no.nav.bidrag.transport.samhandler.SamhandlerSøk
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
+import org.hibernate.exception.ConstraintViolationException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -71,11 +75,15 @@ class SamhandlerService(
             TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
             samhandlerDto,
         )
-        val opprettetSamhandler = samhandlerRepository.save(samhandler)
-        entityManager.refresh(opprettetSamhandler)
-        kafkaService.sendSamhandlerMelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
+        try {
+            val opprettetSamhandler = samhandlerRepository.save(samhandler)
+            entityManager.refresh(opprettetSamhandler)
+            kafkaService.sendSamhandlerMelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
 
-        return opprettetSamhandler.id!!
+            return opprettetSamhandler.id!!
+        } catch (e: DataIntegrityViolationException) {
+            behandleDataIntegrityException(e, samhandlerDto)
+        }
     }
 
     private fun validerOpprettSamhandlerIkkeFinnesFraFør(samhandlerDto: SamhandlerDto) {
@@ -92,8 +100,7 @@ class SamhandlerService(
         }
 
         if (identtiskeSamhandlere.isNotEmpty()) {
-            throw HttpClientErrorException(
-                HttpStatus.CONFLICT,
+            throw ConflictException(
                 "Feil ved opprettelse av samhandler: Samhandler med samme offentlig ID og kontonummer finnes fra før.",
                 commonObjectmapper.writeValueAsBytes(
                     SamhandlerValideringsfeil(
@@ -106,7 +113,6 @@ class SamhandlerService(
                         },
                     ),
                 ),
-                Charset.defaultCharset(),
             )
         }
     }
@@ -297,5 +303,38 @@ class SamhandlerService(
                 )
             }
         }
+    }
+
+    fun behandleDataIntegrityException(
+        e: DataIntegrityViolationException,
+        request: SamhandlerDto,
+    ): Nothing {
+        if (e.cause is ConstraintViolationException) {
+            val samhandlerId = request.samhandlerId
+            val psqlException = (e.cause as ConstraintViolationException).sqlException
+            // 23505 betyr unique violation i postgres
+            if (samhandlerId != null && psqlException.sqlState == "23505") {
+                val samhandler = samhandlerRepository.findByIdentInNewTransaction(samhandlerId.verdi)
+
+                if (samhandler != null) {
+                    secureLogger.error {
+                        "Feil ved lagring av samhandler. Det finnes allerede et samhandler med samhandlerId ${request.samhandlerId}. Request: $request"
+                    }
+                    throw ConflictException(
+                        "Et samhandler med angitt samhandlerId finnes allerede",
+                        SamhandlerValideringsfeil(
+                            duplikatSamhandler =
+                                DuplikatSamhandler(
+                                    "Samhandler med samme samhandlerId finnes fra før",
+                                    samhandlerId.verdi,
+                                    listOf("samhandlerId"),
+                                ),
+                        ),
+                    )
+                }
+            }
+        }
+        secureLogger.error(e) { "Uventet feil ved lagring av samhandler: ${e.message}" }
+        throw e
     }
 }
