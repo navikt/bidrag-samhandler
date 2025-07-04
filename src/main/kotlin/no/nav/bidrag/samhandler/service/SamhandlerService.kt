@@ -2,24 +2,41 @@ package no.nav.bidrag.samhandler.service
 
 import jakarta.persistence.EntityManager
 import no.nav.bidrag.commons.security.utils.TokenUtils
+import no.nav.bidrag.commons.util.secureLogger
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.domene.land.Landkode3
 import no.nav.bidrag.samhandler.SECURE_LOGGER
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
+import no.nav.bidrag.samhandler.model.DuplikatSamhandler
+import no.nav.bidrag.samhandler.model.SamhandlerValideringsfeil
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
+import no.nav.bidrag.samhandler.util.ConflictException
+import no.nav.bidrag.samhandler.util.DuplikatSamhandlerMap
 import no.nav.bidrag.samhandler.util.KontonummerUtils
+import no.nav.bidrag.samhandler.util.ValideringMap
+import no.nav.bidrag.samhandler.util.add
+import no.nav.bidrag.samhandler.util.getPath
+import no.nav.bidrag.samhandler.util.leggTil
 import no.nav.bidrag.samhandler.util.nullIfEmpty
+import no.nav.bidrag.transport.felles.commonObjectmapper
 import no.nav.bidrag.transport.samhandler.AdresseDto
 import no.nav.bidrag.transport.samhandler.KontonummerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerKafkaHendelsestype
 import no.nav.bidrag.transport.samhandler.SamhandlerSøk
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
+import org.hibernate.exception.ConstraintViolationException
+import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.client.HttpClientErrorException
+import java.nio.charset.Charset
+import kotlin.collections.component1
+import kotlin.collections.component2
 import kotlin.jvm.optionals.getOrNull
 
 @Service
@@ -52,6 +69,7 @@ class SamhandlerService(
 
     @Transactional
     fun opprettSamhandler(samhandlerDto: SamhandlerDto): Int {
+        validerOpprettSamhandlerIkkeFinnesFraFør(samhandlerDto)
         val samhandler = SamhandlerMapper.mapTilSamhandler(samhandlerDto)
         SECURE_LOGGER.info(
             "OpprettSamhandler for {} utført av {} med følgende data: {}",
@@ -59,11 +77,44 @@ class SamhandlerService(
             TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
             samhandlerDto,
         )
-        val opprettetSamhandler = samhandlerRepository.save(samhandler)
-        entityManager.refresh(opprettetSamhandler)
-        kafkaService.sendSamhandlerMelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
+        try {
+            val opprettetSamhandler = samhandlerRepository.save(samhandler)
+            entityManager.refresh(opprettetSamhandler)
+            kafkaService.sendSamhandlerMelding(opprettetSamhandler, SamhandlerKafkaHendelsestype.OPPRETTET)
 
-        return opprettetSamhandler.id!!
+            return opprettetSamhandler.id!!
+        } catch (e: DataIntegrityViolationException) {
+            behandleDataIntegrityException(e, samhandlerDto)
+        }
+    }
+
+    private fun validerOpprettSamhandlerIkkeFinnesFraFør(samhandlerDto: SamhandlerDto) {
+        val samhandlerMedSammeOffentligId = samhandlerRepository.findAllByOffentligId(samhandlerDto.offentligId)
+        if (samhandlerMedSammeOffentligId.isEmpty()) return
+        val identtiskeSamhandlere: DuplikatSamhandlerMap = mutableMapOf()
+        samhandlerMedSammeOffentligId.forEach {
+            if (it.norskkontonr != null && it.norskkontonr == samhandlerDto.kontonummer?.norskKontonummer.nullIfEmpty()) {
+                identtiskeSamhandlere.add(it.ident!!, "kontonummer.norskKontonummer")
+            }
+            if (it.iban != null && it.iban == samhandlerDto.kontonummer?.iban.nullIfEmpty()) {
+                identtiskeSamhandlere.add(it.ident!!, "kontonummer.iban")
+            }
+        }
+
+        if (identtiskeSamhandlere.isNotEmpty()) {
+            throw ConflictException(
+                "Feil ved opprettelse av samhandler: Samhandler med samme offentlig ID og kontonummer finnes fra før.",
+                SamhandlerValideringsfeil(
+                    identtiskeSamhandlere.entries.first().let { (samhandlerId, felter) ->
+                        DuplikatSamhandler(
+                            "Samhandler med samme offentlig ID og kontonummer finnes fra før",
+                            samhandlerId,
+                            felter,
+                        )
+                    },
+                ),
+            )
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -75,9 +126,17 @@ class SamhandlerService(
     @Transactional
     fun oppdaterSamhandler(samhandlerDto: SamhandlerDto): ResponseEntity<*> {
         val samhandlerIdent =
-            samhandlerDto.samhandlerId?.verdi ?: return ResponseEntity
-                .badRequest()
-                .body("Oppdatering av samhandler må ha angitt samhandlerId!")
+            samhandlerDto.samhandlerId?.verdi
+                ?: throw HttpClientErrorException(
+                    HttpStatus.BAD_REQUEST,
+                    "Oppdatering av samhandler må ha angitt samhandlerId!",
+                    commonObjectmapper.writeValueAsBytes(
+                        SamhandlerValideringsfeil(
+                            ugyldigInput = mapOf(SamhandlerDto::samhandlerId.name to "SamhandlerId må angis ved oppdatering av samhandler"),
+                        ),
+                    ),
+                    Charset.defaultCharset(),
+                )
         val samhandler =
             samhandlerRepository.findByIdent(samhandlerIdent) ?: return ResponseEntity.notFound().build<Any>()
 
@@ -130,74 +189,160 @@ class SamhandlerService(
         return ResponseEntity.ok(SamhandlerMapper.mapTilSamhandlerDto(oppdatertSamhandler))
     }
 
-    fun validerInput(samhandlerDto: SamhandlerDto): ResponseEntity<*>? {
+    fun validerInput(
+        samhandlerDto: SamhandlerDto,
+        opprettSamhandler: Boolean = false,
+    ) {
+        val valideringsfeil: ValideringMap = mutableMapOf()
         if (samhandlerDto.adresse != null) {
-            validerAdresse(samhandlerDto.adresse!!)?.let { return it }
+            validerAdresse(samhandlerDto.adresse!!, valideringsfeil)
         }
         if (samhandlerDto.kontonummer != null) {
-            validerKontonummer(samhandlerDto.kontonummer!!)?.let { return it }
+            validerKontonummer(samhandlerDto.kontonummer!!, valideringsfeil)
         }
         if (samhandlerDto.språk == null) {
-            return ResponseEntity.badRequest().body("Språk må angis.")
+            valideringsfeil.leggTil(
+                getPath(SamhandlerDto::språk),
+                "Språk må angis.",
+            )
         }
-
-        return null
+        val samhandlerIdInput = samhandlerDto.samhandlerId
+        if (opprettSamhandler && samhandlerIdInput != null && samhandlerIdInput.verdi.isNotEmpty()) {
+            valideringsfeil.leggTil(
+                getPath(SamhandlerDto::samhandlerId),
+                "Kan ikke sette samhandlerId ved opprettelse av samhandler.",
+            )
+        }
+        if (valideringsfeil.isNotEmpty()) {
+            throw HttpClientErrorException(
+                HttpStatus.BAD_REQUEST,
+                "Feil ved ${if (opprettSamhandler) "opprettelse" else "oppdatering"} av samhandler ${samhandlerDto.samhandlerId ?: ""}",
+                commonObjectmapper.writeValueAsBytes(
+                    SamhandlerValideringsfeil(
+                        ugyldigInput = valideringsfeil,
+                    ),
+                ),
+                Charset.defaultCharset(),
+            )
+        }
     }
 
-    private fun validerKontonummer(kontonummer: KontonummerDto): ResponseEntity<*>? {
+    private fun validerKontonummer(
+        kontonummer: KontonummerDto,
+        valideringsfeil: ValideringMap,
+    ) {
         if (kontonummer.norskKontonummer?.isNotEmpty() == true) {
             if (kontonummer.norskKontonummer?.length != 11) {
-                return ResponseEntity.badRequest().body("Norsk kontonummer må være 11 tegn langt.")
+                valideringsfeil.leggTil(
+                    getPath(SamhandlerDto::kontonummer, KontonummerDto::norskKontonummer),
+                    "Norsk kontonummer må være 11 tegn langt.",
+                )
             }
             if (!KontonummerUtils.erGyldigKontonummerMod11(kontonummer.norskKontonummer!!)) {
-                return ResponseEntity.badRequest().body("Det er angitt et ugyldig norsk kontonummer.")
+                valideringsfeil.leggTil(
+                    getPath(SamhandlerDto::kontonummer, KontonummerDto::norskKontonummer),
+                    "Det er angitt et ugyldig norsk kontonummer.",
+                )
             }
         }
         if (kontonummer.valutakode == null) {
-            return ResponseEntity.badRequest().body("Valutakode må angis.")
+            valideringsfeil.leggTil(
+                getPath(SamhandlerDto::kontonummer, KontonummerDto::valutakode),
+                "Valutakode må angis.",
+            )
         }
         if (kontonummer.landkodeBank != null && kontonummer.landkodeBank?.gyldig() == false) {
-            return ResponseEntity
-                .badRequest()
-                .body("Landkode for bank ${kontonummer.landkodeBank?.verdi} må ha 3 tegn.")
+            valideringsfeil.leggTil(
+                getPath(SamhandlerDto::kontonummer, KontonummerDto::landkodeBank),
+                "Landkode for bank ${kontonummer.landkodeBank?.verdi} må ha 3 tegn.",
+            )
         }
         if (kontonummer.norskKontonummer.isNullOrBlank() &&
             kontonummer.iban.isNullOrBlank() &&
             kontonummer.swift.isNullOrBlank()
         ) {
-            return ResponseEntity
-                .badRequest()
-                .body("Samhandleren må ha kontonummeropplysninger. Fyll inn enten norsk eller utenlandsk kontoinformasjon.")
+            valideringsfeil.leggTil(
+                getPath(SamhandlerDto::kontonummer, KontonummerDto::norskKontonummer),
+                "Samhandleren må ha kontonummeropplysninger. Fyll inn enten norsk eller utenlandsk kontoinformasjon.",
+            )
+            valideringsfeil.leggTil(
+                getPath(SamhandlerDto::kontonummer, KontonummerDto::iban),
+                "Samhandleren må ha kontonummeropplysninger. Fyll inn enten norsk eller utenlandsk kontoinformasjon.",
+            )
         }
-        return null
     }
 
-    private fun validerAdresse(adresse: AdresseDto): ResponseEntity<*>? {
+    private fun validerAdresse(
+        adresse: AdresseDto,
+        valideringsfeil: ValideringMap,
+    ) {
         if (adresse.adresselinje1.isNullOrBlank() &&
             (
                 adresse.adresselinje2?.isNotEmpty() == true ||
                     adresse.adresselinje3?.isNotEmpty() == true
             )
         ) {
-            return ResponseEntity
-                .badRequest()
-                .body("Adresselinje1 må fylles ut før adresselinje 2 eller adresselinje 3.")
+            valideringsfeil.leggTil(
+                getPath(SamhandlerDto::adresse, AdresseDto::adresselinje1),
+                "Adresselinje1 må fylles ut før adresselinje 2 eller adresselinje 3.",
+            )
         }
         if (adresse.adresselinje1?.isNotEmpty() == true) {
             if (adresse.land?.verdi.isNullOrBlank()) {
-                return ResponseEntity.badRequest().body("Landkode med 3 tegn må angis for adresse.")
+                valideringsfeil.leggTil(
+                    getPath(SamhandlerDto::adresse, AdresseDto::land),
+                    "Landkode med 3 tegn må angis for adresse.",
+                )
             }
             if (adresse.land?.gyldig() == false) {
-                return ResponseEntity
-                    .badRequest()
-                    .body("Landkode ${adresse.land?.verdi} må ha 3 tegn, og kan ikke være blank.")
+                valideringsfeil.leggTil(
+                    getPath(SamhandlerDto::adresse, AdresseDto::land),
+                    "Landkode ${adresse.land?.verdi} må ha 3 tegn, og kan ikke være blank.",
+                )
             }
             if (adresse.land?.equals(Landkode3("NOR")) == true && (adresse.postnr.isNullOrBlank() || adresse.poststed.isNullOrBlank())) {
-                return ResponseEntity
-                    .badRequest()
-                    .body("Postnummer og poststed må angis for norske adresser.")
+                valideringsfeil.leggTil(
+                    getPath(SamhandlerDto::adresse, AdresseDto::postnr),
+                    "Postnummer og poststed må angis for norske adresser.",
+                )
+                valideringsfeil.leggTil(
+                    getPath(SamhandlerDto::adresse, AdresseDto::poststed),
+                    "Postnummer og poststed må angis for norske adresser.",
+                )
             }
         }
-        return null
+    }
+
+    fun behandleDataIntegrityException(
+        e: DataIntegrityViolationException,
+        request: SamhandlerDto,
+    ): Nothing {
+        if (e.cause is ConstraintViolationException) {
+            val samhandlerId = request.samhandlerId
+            val psqlException = (e.cause as ConstraintViolationException).sqlException
+            // 23505 betyr unique violation i postgres
+            if (samhandlerId != null && psqlException.sqlState == "23505") {
+                val samhandler = samhandlerRepository.findByIdentInNewTransaction(samhandlerId.verdi)
+
+                if (samhandler != null) {
+                    secureLogger.error {
+                        "Feil ved lagring av samhandler. Det finnes allerede et samhandler med samhandlerId ${request.samhandlerId}. Request: $request"
+                    }
+                    throw ConflictException(
+                        "Et samhandler med angitt samhandlerId finnes allerede",
+                        SamhandlerValideringsfeil(
+                            duplikatSamhandler =
+                                DuplikatSamhandler(
+                                    "Samhandler med samme samhandlerId finnes fra før",
+                                    samhandlerId.verdi,
+                                    listOf("samhandlerId"),
+                                ),
+                        ),
+                    )
+                }
+            }
+        }
+        secureLogger.error(e) { "Uventet feil ved lagring av samhandler: ${e.message}" }
+        throw e
     }
 }

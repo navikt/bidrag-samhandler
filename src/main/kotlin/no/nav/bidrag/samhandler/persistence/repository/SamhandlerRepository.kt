@@ -8,10 +8,16 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 
 interface SamhandlerRepository :
     JpaRepository<Samhandler, Int>,
     JpaSpecificationExecutor<Samhandler> {
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
+    @Query("select s from samhandlere s where s.ident = :ident")
+    fun findByIdentInNewTransaction(ident: String): Samhandler?
+
     fun findByIdent(ident: String): Samhandler?
 
     fun findAllByNavnIgnoreCaseAndPostnr(
@@ -20,6 +26,8 @@ interface SamhandlerRepository :
     ): List<Samhandler>
 
     fun findAllByNavnIgnoreCase(navn: String): List<Samhandler>
+
+    fun findAllByOffentligId(offentligId: String): List<Samhandler>
 
     @Query("SELECT set_config('audit.user_id', :userId, true)")
     fun setAuditUserId(userId: String): Any

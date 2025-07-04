@@ -16,6 +16,6 @@ class BidragSamhandlerLocal
 
 fun main(args: Array<String>) {
     val app = SpringApplication(BidragSamhandlerLocal::class.java)
-    app.setAdditionalProfiles("local", "nais")
+    app.setAdditionalProfiles("local", "nais", "lokal-nais-secrets")
     app.run(*args)
 }

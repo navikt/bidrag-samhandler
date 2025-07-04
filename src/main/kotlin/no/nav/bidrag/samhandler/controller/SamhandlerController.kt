@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.nav.bidrag.domene.ident.Ident
+import no.nav.bidrag.samhandler.model.SamhandlerValideringsfeil
 import no.nav.bidrag.samhandler.service.SamhandlerService
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerSøk
@@ -72,10 +73,36 @@ class SamhandlerController(
         description = "Oppretter samhandler.",
         security = [SecurityRequirement(name = "bearer-key")],
     )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "Det finnes en identisk samhandler fra før.",
+                content = [
+                    Content(
+                        schema = Schema(implementation = SamhandlerValideringsfeil::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Validering av samhandlerDto feilet",
+                content = [
+                    Content(
+                        schema = Schema(implementation = SamhandlerValideringsfeil::class),
+                    ),
+                ],
+            ),
+        ],
+    )
     fun opprettSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> {
-        samhandlerService.validerInput(samhandlerDto)?.let { return it }
+        samhandlerService.validerInput(samhandlerDto)
+
         val samhandlerId = samhandlerService.opprettSamhandler(samhandlerDto)
         return ResponseEntity.ok(samhandlerService.hentSamhandlerPåId(samhandlerId))
     }
@@ -85,10 +112,26 @@ class SamhandlerController(
         description = "Oppdaterer samhandler.",
         security = [SecurityRequirement(name = "bearer-key")],
     )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Validering av samhandlerDto feilet",
+                content = [
+                    Content(
+                        schema = Schema(implementation = SamhandlerValideringsfeil::class),
+                    ),
+                ],
+            ),
+        ],
+    )
     fun oppdaterSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> {
-        samhandlerService.validerInput(samhandlerDto)?.let { return it }
+        samhandlerService.validerInput(samhandlerDto)
         return samhandlerService.oppdaterSamhandler(samhandlerDto)
     }
 }

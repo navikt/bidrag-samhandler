@@ -1,7 +1,10 @@
 package no.nav.bidrag.samhandler.service
 
+import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.RelaxedMockK
@@ -27,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.ResponseEntity
+import org.springframework.web.client.HttpStatusCodeException
 import java.util.Optional
 
 @ExtendWith(MockKExtension::class)
@@ -97,8 +101,8 @@ class SamhandlerServiceTest {
     @Test
     fun `oppdaterSamhandler skal returnere ResponseEntity med bad request når samhandlerId er null`() {
         val invalidSamhandlerDto = samhandlerDto.copy(samhandlerId = null)
-        val result = samhandlerService.oppdaterSamhandler(invalidSamhandlerDto)
-        result shouldBe ResponseEntity.badRequest().body("Oppdatering av samhandler må ha angitt samhandlerId!")
+        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.oppdaterSamhandler(invalidSamhandlerDto) }
+        result.responseBodyAsString shouldContain "SamhandlerId må angis ved oppdatering av samhandler"
     }
 
     @Test
@@ -128,11 +132,8 @@ class SamhandlerServiceTest {
                 land = null,
             )
         val dto = samhandlerDto.copy(adresse = adresse, språk = Språk.NB)
-        val result = samhandlerService.validerInput(dto)
-        result shouldBe
-            ResponseEntity
-                .badRequest()
-                .body("Adresselinje1 må fylles ut før adresselinje 2 eller adresselinje 3.")
+        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
+        result.responseBodyAsString shouldContain "Adresselinje1 må fylles ut før adresselinje 2 eller adresselinje 3."
     }
 
     @Test
@@ -147,8 +148,8 @@ class SamhandlerServiceTest {
                 land = null,
             )
         val dto = samhandlerDto.copy(adresse = adresse, språk = Språk.NB)
-        val result = samhandlerService.validerInput(dto)
-        result shouldBe ResponseEntity.badRequest().body("Landkode med 3 tegn må angis for adresse.")
+        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
+        result.responseBodyAsString shouldContain "Landkode med 3 tegn må angis for adresse."
     }
 
     @Test
@@ -163,8 +164,8 @@ class SamhandlerServiceTest {
                 land = Landkode3(""),
             )
         val dto = samhandlerDto.copy(adresse = adresse, språk = Språk.NB)
-        val result = samhandlerService.validerInput(dto)
-        result shouldBe ResponseEntity.badRequest().body("Landkode med 3 tegn må angis for adresse.")
+        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
+        result.responseBodyAsString shouldContain "Landkode med 3 tegn må angis for adresse."
     }
 
     @Test
@@ -179,8 +180,8 @@ class SamhandlerServiceTest {
                 land = Landkode3("NOR"),
             )
         val dto = samhandlerDto.copy(adresse = adresse, språk = Språk.NB)
-        val result = samhandlerService.validerInput(dto)
-        result shouldBe ResponseEntity.badRequest().body("Postnummer og poststed må angis for norske adresser.")
+        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
+        result.responseBodyAsString shouldContain "Postnummer og poststed må angis for norske adresser."
     }
 
     @Test
@@ -196,8 +197,8 @@ class SamhandlerServiceTest {
                 bankCode = null,
             )
         val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
-        val result = samhandlerService.validerInput(dto)
-        result shouldBe ResponseEntity.badRequest().body("Norsk kontonummer må være 11 tegn langt.")
+        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
+        result.responseBodyAsString shouldContain "Norsk kontonummer må være 11 tegn langt."
     }
 
     @Test
@@ -214,8 +215,8 @@ class SamhandlerServiceTest {
             )
         every { KontonummerUtils.erGyldigKontonummerMod11("12345678901") } returns false
         val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
-        val result = samhandlerService.validerInput(dto)
-        result shouldBe ResponseEntity.badRequest().body("Det er angitt et ugyldig norsk kontonummer.")
+        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
+        result.responseBodyAsString shouldContain "Det er angitt et ugyldig norsk kontonummer."
     }
 
     @Test
@@ -232,8 +233,8 @@ class SamhandlerServiceTest {
             )
         every { KontonummerUtils.erGyldigKontonummerMod11("12345678901") } returns true
         val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
-        val result = samhandlerService.validerInput(dto)
-        result shouldBe ResponseEntity.badRequest().body("Valutakode må angis.")
+        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
+        result.responseBodyAsString shouldContain "Valutakode må angis."
     }
 
     @Test
@@ -249,8 +250,8 @@ class SamhandlerServiceTest {
                 bankCode = null,
             )
         val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
-        val result = samhandlerService.validerInput(dto)
-        result shouldBe ResponseEntity.badRequest().body("Landkode for bank NO må ha 3 tegn.")
+        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
+        result.responseBodyAsString shouldContain "Landkode for bank NO må ha 3 tegn."
     }
 
     @Test
@@ -266,18 +267,16 @@ class SamhandlerServiceTest {
                 bankCode = null,
             )
         val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
-        val result = samhandlerService.validerInput(dto)
-        result shouldBe
-            ResponseEntity
-                .badRequest()
-                .body("Samhandleren må ha kontonummeropplysninger. Fyll inn enten norsk eller utenlandsk kontoinformasjon.")
+        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
+        result.responseBodyAsString shouldContain
+            "Samhandleren må ha kontonummeropplysninger. Fyll inn enten norsk eller utenlandsk kontoinformasjon."
     }
 
     @Test
     fun `validerInput returnerer bad request om språk er null`() {
         val dto = samhandlerDto.copy(språk = null, kontonummer = KontonummerDto(iban = "123", valutakode = Valutakode.NOK))
-        val result = samhandlerService.validerInput(dto)
-        result shouldBe ResponseEntity.badRequest().body("Språk må angis.")
+        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
+        result.responseBodyAsString shouldContain "Språk må angis."
     }
 
     @Test
@@ -303,8 +302,7 @@ class SamhandlerServiceTest {
             )
         every { KontonummerUtils.erGyldigKontonummerMod11("12345678901") } returns true
         val dto = samhandlerDto.copy(adresse = adresse, kontonummer = kontonummer, språk = Språk.NB)
-        val result = samhandlerService.validerInput(dto)
-        result shouldBe null
+        shouldNotThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
     }
 
     @AfterEach
