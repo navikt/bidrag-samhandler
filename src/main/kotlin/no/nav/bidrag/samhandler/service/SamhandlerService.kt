@@ -69,7 +69,7 @@ class SamhandlerService(
 
     @Transactional
     fun opprettSamhandler(samhandlerDto: SamhandlerDto): Int {
-        validerOpprettSamhandlerIkkeFinnesFraFør(samhandlerDto)
+        validerSamhandlerIkkeFinnesFraFør(samhandlerDto)
         val samhandler = SamhandlerMapper.mapTilSamhandler(samhandlerDto)
         SECURE_LOGGER.info(
             "OpprettSamhandler for {} utført av {} med følgende data: {}",
@@ -88,11 +88,11 @@ class SamhandlerService(
         }
     }
 
-    private fun validerOpprettSamhandlerIkkeFinnesFraFør(samhandlerDto: SamhandlerDto) {
+    private fun validerSamhandlerIkkeFinnesFraFør(samhandlerDto: SamhandlerDto) {
         val samhandlerMedSammeOffentligId = samhandlerRepository.findAllByOffentligId(samhandlerDto.offentligId)
         if (samhandlerMedSammeOffentligId.isEmpty()) return
         val identtiskeSamhandlere: DuplikatSamhandlerMap = mutableMapOf()
-        samhandlerMedSammeOffentligId.forEach {
+        samhandlerMedSammeOffentligId.filter { it.ident != samhandlerDto.samhandlerId?.verdi }.forEach {
             if (it.norskkontonr != null && it.norskkontonr == samhandlerDto.kontonummer?.norskKontonummer.nullIfEmpty()) {
                 identtiskeSamhandlere.add(it.ident!!, "kontonummer.norskKontonummer")
             }
@@ -103,7 +103,9 @@ class SamhandlerService(
 
         if (identtiskeSamhandlere.isNotEmpty()) {
             throw ConflictException(
-                "Feil ved opprettelse av samhandler: Samhandler med samme offentlig ID og kontonummer finnes fra før.",
+                "Feil ved " +
+                    (samhandlerDto.samhandlerId?.let { "oppdatering" } ?: "opprettelse") +
+                    " av samhandler: Samhandler med samme offentlig ID og kontonummer finnes fra før.",
                 SamhandlerValideringsfeil(
                     identtiskeSamhandlere.entries.first().let { (samhandlerId, felter) ->
                         DuplikatSamhandler(
@@ -125,6 +127,7 @@ class SamhandlerService(
 
     @Transactional
     fun oppdaterSamhandler(samhandlerDto: SamhandlerDto): ResponseEntity<*> {
+        validerSamhandlerIkkeFinnesFraFør(samhandlerDto)
         val samhandlerIdent =
             samhandlerDto.samhandlerId?.verdi
                 ?: throw HttpClientErrorException(
@@ -207,7 +210,7 @@ class SamhandlerService(
             )
         }
         val samhandlerIdInput = samhandlerDto.samhandlerId
-        if (opprettSamhandler && samhandlerIdInput != null && samhandlerIdInput.verdi.isNotEmpty()) {
+        if (opprettSamhandler && samhandlerIdInput != null && samhandlerIdInput.verdi.trim().isNotEmpty()) {
             valideringsfeil.leggTil(
                 getPath(SamhandlerDto::samhandlerId),
                 "Kan ikke sette samhandlerId ved opprettelse av samhandler.",

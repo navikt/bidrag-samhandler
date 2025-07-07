@@ -1,5 +1,6 @@
 package no.nav.bidrag.samhandler.aop
 
+import no.nav.bidrag.commons.util.secureLogger
 import no.nav.bidrag.transport.felles.ifTrue
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.slf4j.LoggerFactory
@@ -25,6 +26,7 @@ class DefaultRestControllerAdvice {
         val payloadFeilmelding =
             exception.responseBodyAsString.isEmpty().ifTrue { exception.message }
                 ?: exception.responseBodyAsString
+        secureLogger.warn { "Det skjedde en feil: $payloadFeilmelding" }
         return ResponseEntity
             .status(exception.statusCode)
             .header(HttpHeaders.WARNING, errorMessage)
