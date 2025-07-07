@@ -210,7 +210,7 @@ class SamhandlerService(
             )
         }
         val samhandlerIdInput = samhandlerDto.samhandlerId
-        if (opprettSamhandler && samhandlerIdInput != null && samhandlerIdInput.verdi.isNotEmpty()) {
+        if (opprettSamhandler && samhandlerIdInput != null && samhandlerIdInput.verdi.trim().isNotEmpty()) {
             valideringsfeil.leggTil(
                 getPath(SamhandlerDto::samhandlerId),
                 "Kan ikke sette samhandlerId ved opprettelse av samhandler.",
