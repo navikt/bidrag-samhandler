@@ -7,25 +7,27 @@ import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.domene.land.Landkode3
 import no.nav.bidrag.samhandler.SECURE_LOGGER
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
-import no.nav.bidrag.samhandler.model.DuplikatSamhandler
-import no.nav.bidrag.samhandler.model.SamhandlerValideringsfeil
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
 import no.nav.bidrag.samhandler.util.ConflictException
 import no.nav.bidrag.samhandler.util.DuplikatSamhandlerMap
 import no.nav.bidrag.samhandler.util.KontonummerUtils
-import no.nav.bidrag.samhandler.util.ValideringMap
 import no.nav.bidrag.samhandler.util.add
 import no.nav.bidrag.samhandler.util.getPath
+import no.nav.bidrag.samhandler.util.kontonummerNumerisk
 import no.nav.bidrag.samhandler.util.leggTil
 import no.nav.bidrag.samhandler.util.nullIfEmpty
 import no.nav.bidrag.transport.felles.commonObjectmapper
 import no.nav.bidrag.transport.samhandler.AdresseDto
+import no.nav.bidrag.transport.samhandler.DuplikatSamhandler
+import no.nav.bidrag.transport.samhandler.FeltValideringsfeil
 import no.nav.bidrag.transport.samhandler.KontonummerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerKafkaHendelsestype
 import no.nav.bidrag.transport.samhandler.SamhandlerSøk
+import no.nav.bidrag.transport.samhandler.SamhandlerValideringsfeil
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
+import no.nav.bidrag.transport.samhandler.leggTil
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
@@ -93,7 +95,9 @@ class SamhandlerService(
         if (samhandlerMedSammeOffentligId.isEmpty()) return
         val identtiskeSamhandlere: DuplikatSamhandlerMap = mutableMapOf()
         samhandlerMedSammeOffentligId.filter { it.ident != samhandlerDto.samhandlerId?.verdi }.forEach {
-            if (it.norskkontonr != null && it.norskkontonr == samhandlerDto.kontonummer?.norskKontonummer.nullIfEmpty()) {
+            if (it.norskkontonr.kontonummerNumerisk != null &&
+                it.norskkontonr.kontonummerNumerisk == samhandlerDto.kontonummer?.norskKontonummer.kontonummerNumerisk
+            ) {
                 identtiskeSamhandlere.add(it.ident!!, "kontonummer.norskKontonummer")
             }
             if (it.iban != null && it.iban == samhandlerDto.kontonummer?.iban.nullIfEmpty()) {
@@ -107,7 +111,7 @@ class SamhandlerService(
                     (samhandlerDto.samhandlerId?.let { "oppdatering" } ?: "opprettelse") +
                     " av samhandler: Samhandler med samme offentlig ID og kontonummer finnes fra før.",
                 SamhandlerValideringsfeil(
-                    identtiskeSamhandlere.entries.first().let { (samhandlerId, felter) ->
+                    identtiskeSamhandlere.entries.map { (samhandlerId, felter) ->
                         DuplikatSamhandler(
                             "Samhandler med samme offentlig ID og kontonummer finnes fra før",
                             samhandlerId,
@@ -135,7 +139,13 @@ class SamhandlerService(
                     "Oppdatering av samhandler må ha angitt samhandlerId!",
                     commonObjectmapper.writeValueAsBytes(
                         SamhandlerValideringsfeil(
-                            ugyldigInput = mapOf(SamhandlerDto::samhandlerId.name to "SamhandlerId må angis ved oppdatering av samhandler"),
+                            ugyldigInput =
+                                listOf(
+                                    FeltValideringsfeil(
+                                        SamhandlerDto::samhandlerId.name,
+                                        "SamhandlerId må angis ved oppdatering av samhandler",
+                                    ),
+                                ),
                         ),
                     ),
                     Charset.defaultCharset(),
@@ -196,7 +206,7 @@ class SamhandlerService(
         samhandlerDto: SamhandlerDto,
         opprettSamhandler: Boolean = false,
     ) {
-        val valideringsfeil: ValideringMap = mutableMapOf()
+        val valideringsfeil: MutableList<FeltValideringsfeil> = mutableListOf()
         if (samhandlerDto.adresse != null) {
             validerAdresse(samhandlerDto.adresse!!, valideringsfeil)
         }
@@ -232,16 +242,18 @@ class SamhandlerService(
 
     private fun validerKontonummer(
         kontonummer: KontonummerDto,
-        valideringsfeil: ValideringMap,
+        valideringsfeil: MutableList<FeltValideringsfeil>,
     ) {
-        if (kontonummer.norskKontonummer?.isNotEmpty() == true) {
-            if (kontonummer.norskKontonummer?.length != 11) {
+        val norskKontonummerNumerisk =
+            kontonummer.norskKontonummer.kontonummerNumerisk
+        if (norskKontonummerNumerisk != null) {
+            if (norskKontonummerNumerisk.length != 11) {
                 valideringsfeil.leggTil(
                     getPath(SamhandlerDto::kontonummer, KontonummerDto::norskKontonummer),
                     "Norsk kontonummer må være 11 tegn langt.",
                 )
             }
-            if (!KontonummerUtils.erGyldigKontonummerMod11(kontonummer.norskKontonummer!!)) {
+            if (!KontonummerUtils.erGyldigKontonummerMod11(norskKontonummerNumerisk)) {
                 valideringsfeil.leggTil(
                     getPath(SamhandlerDto::kontonummer, KontonummerDto::norskKontonummer),
                     "Det er angitt et ugyldig norsk kontonummer.",
@@ -277,7 +289,7 @@ class SamhandlerService(
 
     private fun validerAdresse(
         adresse: AdresseDto,
-        valideringsfeil: ValideringMap,
+        valideringsfeil: MutableList<FeltValideringsfeil>,
     ) {
         if (adresse.adresselinje1.isNullOrBlank() &&
             (
@@ -335,10 +347,12 @@ class SamhandlerService(
                         "Et samhandler med angitt samhandlerId finnes allerede",
                         SamhandlerValideringsfeil(
                             duplikatSamhandler =
-                                DuplikatSamhandler(
-                                    "Samhandler med samme samhandlerId finnes fra før",
-                                    samhandlerId.verdi,
-                                    listOf("samhandlerId"),
+                                listOf(
+                                    DuplikatSamhandler(
+                                        "Samhandler med samme samhandlerId finnes fra før",
+                                        samhandlerId.verdi,
+                                        listOf("samhandlerId"),
+                                    ),
                                 ),
                         ),
                     )

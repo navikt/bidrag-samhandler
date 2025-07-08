@@ -7,10 +7,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.nav.bidrag.domene.ident.Ident
-import no.nav.bidrag.samhandler.model.SamhandlerValideringsfeil
 import no.nav.bidrag.samhandler.service.SamhandlerService
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerSøk
+import no.nav.bidrag.transport.samhandler.SamhandlerValideringsfeil
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
@@ -83,7 +83,11 @@ class SamhandlerController(
                 description = "Det finnes en identisk samhandler fra før.",
                 content = [
                     Content(
-                        schema = Schema(implementation = SamhandlerValideringsfeil::class),
+                        schema =
+                            Schema(
+                                implementation =
+                                    SamhandlerValideringsfeil::class,
+                            ),
                     ),
                 ],
             ),
