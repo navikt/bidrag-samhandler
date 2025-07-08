@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import no.nav.bidrag.commons.util.secureLogger
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.samhandler.service.SamhandlerService
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
@@ -105,6 +106,7 @@ class SamhandlerController(
     fun opprettSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> {
+        secureLogger.info { "Oppretter samhandler $samhandlerDto" }
         samhandlerService.validerInput(samhandlerDto)
 
         val samhandlerId = samhandlerService.opprettSamhandler(samhandlerDto)
@@ -135,6 +137,7 @@ class SamhandlerController(
     fun oppdaterSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> {
+        secureLogger.info { "Oppdateter samhandler $samhandlerDto" }
         samhandlerService.validerInput(samhandlerDto)
         return samhandlerService.oppdaterSamhandler(samhandlerDto)
     }
