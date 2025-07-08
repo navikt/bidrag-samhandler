@@ -6,11 +6,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import no.nav.bidrag.commons.util.secureLogger
 import no.nav.bidrag.domene.ident.Ident
-import no.nav.bidrag.samhandler.model.SamhandlerValideringsfeil
 import no.nav.bidrag.samhandler.service.SamhandlerService
 import no.nav.bidrag.transport.samhandler.SamhandlerDto
 import no.nav.bidrag.transport.samhandler.SamhandlerSøk
+import no.nav.bidrag.transport.samhandler.SamhandlerValideringsfeil
 import no.nav.bidrag.transport.samhandler.SamhandlersøkeresultatDto
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.http.ResponseEntity
@@ -83,7 +84,11 @@ class SamhandlerController(
                 description = "Det finnes en identisk samhandler fra før.",
                 content = [
                     Content(
-                        schema = Schema(implementation = SamhandlerValideringsfeil::class),
+                        schema =
+                            Schema(
+                                implementation =
+                                    SamhandlerValideringsfeil::class,
+                            ),
                     ),
                 ],
             ),
@@ -101,6 +106,7 @@ class SamhandlerController(
     fun opprettSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> {
+        secureLogger.info { "Oppretter samhandler $samhandlerDto" }
         samhandlerService.validerInput(samhandlerDto)
 
         val samhandlerId = samhandlerService.opprettSamhandler(samhandlerDto)
@@ -131,6 +137,7 @@ class SamhandlerController(
     fun oppdaterSamhandler(
         @RequestBody samhandlerDto: SamhandlerDto,
     ): ResponseEntity<*> {
+        secureLogger.info { "Oppdateter samhandler $samhandlerDto" }
         samhandlerService.validerInput(samhandlerDto)
         return samhandlerService.oppdaterSamhandler(samhandlerDto)
     }
