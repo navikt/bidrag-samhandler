@@ -4,16 +4,30 @@ import no.nav.bidrag.transport.dokument.isNumeric
 
 object KontonummerUtils {
     fun erGyldigKontonummerMod11(kontonummer: String): Boolean {
-        if (kontonummer.isEmpty() || kontonummer.length != 11 || !kontonummer.isNumeric) {
+        // Fjern mellomrom og punktum
+        val cleanedKontonummer = kontonummer.replace("[\\s.]".toRegex(), "")
+
+        // Valider format: 11 siffer
+        if (cleanedKontonummer.length != 11 || !cleanedKontonummer.isNumeric) {
             return false
         }
-        val kontrollSiffer = kontonummer[kontonummer.length - 1].toString().toInt()
-        val nummerUtenKontrollSiffer = kontonummer.substring(0, kontonummer.length - 1)
-        val resultat =
+
+        val kontrollSiffer = cleanedKontonummer.last().digitToInt()
+        val nummerUtenKontrollSiffer = cleanedKontonummer.dropLast(1)
+
+        // Beregn kontrollsiffer med MOD-11 algoritme
+        val vekter = intArrayOf(5, 4, 3, 2, 7, 6, 5, 4, 3, 2)
+        val sum =
             nummerUtenKontrollSiffer
-                .reversed()
-                .mapIndexed { i, v -> v.toString().toInt() * ((i % 6) + 2) }
+                .mapIndexed { i, c -> c.digitToInt() * vekter[i] }
                 .sum()
-        return (if (resultat == 0) 0 else 11 - (resultat % 11)) == kontrollSiffer
+
+        val beregnetKontrollSiffer = 11 - (sum % 11)
+
+        return when (beregnetKontrollSiffer) {
+            10 -> false // Ugyldig kontonummer
+            11 -> kontrollSiffer == 0
+            else -> kontrollSiffer == beregnetKontrollSiffer
+        }
     }
 }
