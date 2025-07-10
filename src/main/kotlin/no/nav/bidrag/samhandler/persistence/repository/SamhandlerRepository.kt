@@ -27,7 +27,7 @@ interface SamhandlerRepository :
 
     fun findAllByNavnIgnoreCase(navn: String): List<Samhandler>
 
-    fun findAllByOffentligId(offentligId: String): List<Samhandler>
+    fun findAllByOffentligIdAndErOpphørtIsFalse(offentligId: String): List<Samhandler>
 
     @Query("SELECT set_config('audit.user_id', :userId, true)")
     fun setAuditUserId(userId: String): Any
