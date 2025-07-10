@@ -91,7 +91,7 @@ class SamhandlerService(
     }
 
     private fun validerSamhandlerIkkeFinnesFraFør(samhandlerDto: SamhandlerDto) {
-        val samhandlerMedSammeOffentligId = samhandlerRepository.findAllByOffentligId(samhandlerDto.offentligId)
+        val samhandlerMedSammeOffentligId = samhandlerRepository.findAllByOffentligIdAndErOpphørtIsFalse(samhandlerDto.offentligId)
         if (samhandlerMedSammeOffentligId.isEmpty()) return
         val identtiskeSamhandlere: DuplikatSamhandlerMap = mutableMapOf()
         samhandlerMedSammeOffentligId.filter { it.ident != samhandlerDto.samhandlerId?.verdi }.forEach {
