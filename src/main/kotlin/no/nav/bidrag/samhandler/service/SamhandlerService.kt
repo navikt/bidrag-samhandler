@@ -329,7 +329,7 @@ class SamhandlerService(
             if (!adresse.postnr.isNullOrEmpty() && !adresse.postnr!!.isNumeric) {
                 valideringsfeil.leggTil(
                     getPath(SamhandlerDto::adresse, AdresseDto::postnr),
-                    "Postnummer må bare bestå av tall",
+                    "Postnummer kan kun inneholde siffer.",
                 )
             }
         }
