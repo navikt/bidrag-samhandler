@@ -18,6 +18,7 @@ kafka:
   pool: nav-prod
 env:
   TOPIC_SAMHANDLER: bidrag.samhandler
+  KODEVERK_URL: http://bidrag-kodeverk
 azure_access_inbound:
   - application: bidrag-sak
     namespace: bidrag
