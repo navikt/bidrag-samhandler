@@ -17,6 +17,7 @@ import no.nav.bidrag.samhandler.util.getPath
 import no.nav.bidrag.samhandler.util.kontonummerNumerisk
 import no.nav.bidrag.samhandler.util.leggTil
 import no.nav.bidrag.samhandler.util.nullIfEmpty
+import no.nav.bidrag.transport.dokument.isNumeric
 import no.nav.bidrag.transport.felles.commonObjectmapper
 import no.nav.bidrag.transport.samhandler.AdresseDto
 import no.nav.bidrag.transport.samhandler.DuplikatSamhandler
@@ -323,6 +324,12 @@ class SamhandlerService(
                 valideringsfeil.leggTil(
                     getPath(SamhandlerDto::adresse, AdresseDto::poststed),
                     "Postnummer og poststed må angis for norske adresser.",
+                )
+            }
+            if (!adresse.postnr.isNullOrEmpty() && !adresse.postnr!!.isNumeric) {
+                valideringsfeil.leggTil(
+                    getPath(SamhandlerDto::adresse, AdresseDto::postnr),
+                    "Postnummer må bare bestå av tall",
                 )
             }
         }
