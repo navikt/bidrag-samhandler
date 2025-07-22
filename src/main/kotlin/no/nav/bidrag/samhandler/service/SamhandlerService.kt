@@ -15,7 +15,6 @@ import no.nav.bidrag.samhandler.util.KontonummerUtils
 import no.nav.bidrag.samhandler.util.add
 import no.nav.bidrag.samhandler.util.getPath
 import no.nav.bidrag.samhandler.util.kontonummerNumerisk
-import no.nav.bidrag.samhandler.util.leggTil
 import no.nav.bidrag.samhandler.util.nullIfEmpty
 import no.nav.bidrag.transport.dokument.isNumeric
 import no.nav.bidrag.transport.felles.commonObjectmapper
@@ -92,7 +91,8 @@ class SamhandlerService(
     }
 
     private fun validerSamhandlerIkkeFinnesFraFør(samhandlerDto: SamhandlerDto) {
-        val samhandlerMedSammeOffentligId = samhandlerRepository.findAllByOffentligIdAndErOpphørtIsFalse(samhandlerDto.offentligId)
+        val samhandlerMedSammeOffentligId =
+            samhandlerRepository.findAllByOffentligIdAndErOpphørtIsFalse(samhandlerDto.offentligId)
         if (samhandlerMedSammeOffentligId.isEmpty()) return
         val identtiskeSamhandlere: DuplikatSamhandlerMap = mutableMapOf()
         samhandlerMedSammeOffentligId.filter { it.ident != samhandlerDto.samhandlerId?.verdi }.forEach {
@@ -176,7 +176,7 @@ class SamhandlerService(
                 adresselinje1 = samhandlerDto.adresse?.adresselinje1.nullIfEmpty(),
                 adresselinje2 = samhandlerDto.adresse?.adresselinje2.nullIfEmpty(),
                 adresselinje3 = samhandlerDto.adresse?.adresselinje3.nullIfEmpty(),
-                postnr = samhandlerDto.adresse?.postnr.nullIfEmpty(),
+                postnummer = samhandlerDto.adresse?.postnummer.nullIfEmpty(),
                 poststed = samhandlerDto.adresse?.poststed.nullIfEmpty(),
                 land =
                     samhandlerDto.adresse
@@ -207,6 +207,10 @@ class SamhandlerService(
         samhandlerDto: SamhandlerDto,
         opprettSamhandler: Boolean = false,
     ) {
+        if (samhandlerDto.adresse?.postnummer == null && samhandlerDto.adresse?.postnr != null) {
+            throw IllegalArgumentException("Postnummer må angis som postnummer, ikke postnr. Postnr er avviklet.")
+        }
+
         val valideringsfeil: MutableList<FeltValideringsfeil> = mutableListOf()
         if (samhandlerDto.adresse != null) {
             validerAdresse(samhandlerDto.adresse!!, valideringsfeil)
@@ -316,9 +320,11 @@ class SamhandlerService(
                     "Landkode ${adresse.land?.verdi} må ha 3 tegn, og kan ikke være blank.",
                 )
             }
-            if (adresse.land?.equals(Landkode3("NOR")) == true && (adresse.postnr.isNullOrBlank() || adresse.poststed.isNullOrBlank())) {
+            if (adresse.land?.equals(Landkode3("NOR")) == true &&
+                (adresse.postnummer.isNullOrBlank() || adresse.poststed.isNullOrBlank())
+            ) {
                 valideringsfeil.leggTil(
-                    getPath(SamhandlerDto::adresse, AdresseDto::postnr),
+                    getPath(SamhandlerDto::adresse, AdresseDto::postnummer),
                     "Postnummer og poststed må angis for norske adresser.",
                 )
                 valideringsfeil.leggTil(
@@ -326,9 +332,9 @@ class SamhandlerService(
                     "Postnummer og poststed må angis for norske adresser.",
                 )
             }
-            if (!adresse.postnr.isNullOrEmpty() && !adresse.postnr!!.isNumeric) {
+            if (!adresse.postnummer.isNullOrEmpty() && !adresse.postnummer!!.isNumeric) {
                 valideringsfeil.leggTil(
-                    getPath(SamhandlerDto::adresse, AdresseDto::postnr),
+                    getPath(SamhandlerDto::adresse, AdresseDto::postnummer),
                     "Postnummer kan kun inneholde siffer.",
                 )
             }

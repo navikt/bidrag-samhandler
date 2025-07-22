@@ -62,7 +62,7 @@ object SamhandlerSøkSpec {
                 criteriaBuilder.conjunction()
             } else {
                 criteriaBuilder.equal(
-                    criteriaBuilder.upper(root.get("postnr")),
+                    criteriaBuilder.upper(root.get("postnummer")),
                     samhandlerSøk.postnummer!!.uppercase(),
                 )
             }

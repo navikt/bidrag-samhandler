@@ -127,7 +127,7 @@ class SamhandlerServiceTest {
                 adresselinje1 = null,
                 adresselinje2 = "Linje2",
                 adresselinje3 = null,
-                postnr = null,
+                postnummer = null,
                 poststed = null,
                 land = null,
             )
@@ -143,7 +143,7 @@ class SamhandlerServiceTest {
                 adresselinje1 = "Linje1",
                 adresselinje2 = null,
                 adresselinje3 = null,
-                postnr = null,
+                postnummer = null,
                 poststed = null,
                 land = null,
             )
@@ -159,7 +159,7 @@ class SamhandlerServiceTest {
                 adresselinje1 = "Linje1",
                 adresselinje2 = null,
                 adresselinje3 = null,
-                postnr = null,
+                postnummer = null,
                 poststed = null,
                 land = Landkode3(""),
             )
@@ -169,13 +169,13 @@ class SamhandlerServiceTest {
     }
 
     @Test
-    fun `validerInput returnerer bad request om norsk adresse mangler postnr eller poststed`() {
+    fun `validerInput returnerer bad request om norsk adresse mangler postnummer eller poststed`() {
         val adresse =
             AdresseDto(
                 adresselinje1 = "Linje1",
                 adresselinje2 = null,
                 adresselinje3 = null,
-                postnr = null,
+                postnummer = null,
                 poststed = null,
                 land = Landkode3("NOR"),
             )
@@ -274,7 +274,8 @@ class SamhandlerServiceTest {
 
     @Test
     fun `validerInput returnerer bad request om språk er null`() {
-        val dto = samhandlerDto.copy(språk = null, kontonummer = KontonummerDto(iban = "123", valutakode = Valutakode.NOK))
+        val dto =
+            samhandlerDto.copy(språk = null, kontonummer = KontonummerDto(iban = "123", valutakode = Valutakode.NOK))
         val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
         result.responseBodyAsString shouldContain "Språk må angis."
     }
@@ -286,11 +287,12 @@ class SamhandlerServiceTest {
                 adresselinje1 = "Linje1",
                 adresselinje2 = null,
                 adresselinje3 = null,
-                postnr = "1234",
+                postnummer = "1234",
                 poststed = "Oslo",
                 land = Landkode3("NOR"),
             )
         val kontonummer =
+
             KontonummerDto(
                 norskKontonummer = "12345678901",
                 iban = null,

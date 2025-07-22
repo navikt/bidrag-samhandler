@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Protected
 class VisningsnavnController {
-    @OptIn(ExperimentalStdlibApi::class)
-    @Suppress("unused")
     @GetMapping("/visningsnavn")
     fun hentVisningsnavn(): Map<String, String> =
         OffentligIdType.entries.associate { it.name to it.visningsnavn.intern } +

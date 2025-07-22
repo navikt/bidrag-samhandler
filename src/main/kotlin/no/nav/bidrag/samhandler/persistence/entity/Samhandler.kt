@@ -63,8 +63,8 @@ data class Samhandler(
     val adresselinje2: String? = null,
     @Column(name = "adresselinje3")
     val adresselinje3: String? = null,
-    @Column(name = "postnr")
-    val postnr: String? = null,
+    @Column(name = "postnummer")
+    val postnummer: String? = null,
     @Column(name = "poststed")
     val poststed: String? = null,
     @Column(name = "land")
