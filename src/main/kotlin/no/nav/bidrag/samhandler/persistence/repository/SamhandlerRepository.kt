@@ -20,11 +20,6 @@ interface SamhandlerRepository :
 
     fun findByIdent(ident: String): Samhandler?
 
-    fun findAllByNavnIgnoreCaseAndPostnr(
-        navn: String,
-        postnr: String?,
-    ): List<Samhandler>
-
     fun findAllByNavnIgnoreCase(navn: String): List<Samhandler>
 
     fun findAllByOffentligIdAndErOpphørtIsFalse(offentligId: String): List<Samhandler>
@@ -40,6 +35,8 @@ class SamhandlerSaveAspect(
 ) {
     @Before("execution(* no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository.save(..))")
     fun setAuditUserId() {
-        samhandlerRepository.setAuditUserId(TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent")
+        samhandlerRepository.setAuditUserId(
+            TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
+        )
     }
 }
