@@ -3,16 +3,24 @@ BIDRAG_PERSON_URL: https://bidrag-person-feature.dev.adeo.no
 AZURE_APP_TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851
 AZURE_APP_CLIENT_ID: <app_client_id>
 AZURE_APP_CLIENT_SECRET: unset
-server.port: 8999
+server.port: 8991
 TOPIC_SAMHANDLER: bidrag.samhandler-test
 NAIS_APP_NAME: bidrag-samhandler
+KAFKA_BOOTSTRAP_SERVERS: localhost:9092
+KAFKA_GROUP_ID: bidrag-behandling
+KAFKA_BROKERS: localhost:9092
+KODEVERK_URL: https://bidrag-kodeverk.intern.dev.nav.no
+
+
+logging.level:
+  secureLogger: OFF
 
 spring:
   flyway:
     enabled: true
     locations: classpath:/db/migration
   datasource:
-    url: jdbc:postgresql://localhost:5432/default_database?user=cloudsqliamuser&password=samhandleradmin
+    url: jdbc:postgresql://localhost:5454/bidrag-samhandler?user=cloudsqliamuser&password=admin
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       data-source-properties:
@@ -22,7 +30,10 @@ spring:
         sslkey: ""
         sslrootcert: ""
   kafka:
+    bootstrap-servers: ${KAFKA_BROKERS}
     properties:
       security.protocol: PLAINTEXT
     consumer:
-      auto-offset-reset: earliest
+      enableAutoCommit: false
+    listener:
+      ackMode: RECORD
