@@ -27,6 +27,7 @@ object SamhandlerMapper {
                         it.adresselinje1,
                         adresselinje2 = it.adresselinje2,
                         adresselinje3 = it.adresselinje3,
+                        postnr = it.postnummer,
                         postnummer = it.postnummer,
                         poststed = it.poststed,
                         land = it.land?.let { land -> Landkode3(land) },
