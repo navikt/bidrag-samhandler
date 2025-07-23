@@ -4,6 +4,7 @@ import no.nav.bidrag.commons.service.LANDKODER
 import no.nav.bidrag.commons.service.hentKodeverkKodeBeskrivelseMap
 import no.nav.bidrag.domene.enums.samhandler.Kreditortype
 import no.nav.bidrag.domene.enums.samhandler.OffentligIdType
+import no.nav.bidrag.domene.enums.samhandler.Områdekode
 import no.nav.bidrag.domene.enums.samhandler.Valutakode
 import no.nav.bidrag.domene.util.visningsnavn
 import no.nav.security.token.support.core.api.Protected
@@ -18,5 +19,6 @@ class VisningsnavnController {
         OffentligIdType.entries.associate { it.name to it.visningsnavn.intern } +
             Kreditortype.entries.associate { it.name to it.visningsnavn } +
             Valutakode.entries.associate { it.name to it.visningsnavn } +
-            hentKodeverkKodeBeskrivelseMap(LANDKODER).entries.associate { it.key to it.value }
+            hentKodeverkKodeBeskrivelseMap(LANDKODER).entries.associate { it.key to it.value } +
+            Områdekode.entries.associate { it.name to it.visningsnavn }
 }
