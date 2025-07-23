@@ -1,7 +1,6 @@
 package no.nav.bidrag.samhandler.controller
 
 import no.nav.bidrag.commons.service.LANDKODER
-import no.nav.bidrag.commons.service.SPRÅK
 import no.nav.bidrag.commons.service.hentKodeverkKodeBeskrivelseMap
 import no.nav.bidrag.domene.enums.diverse.Språk
 import no.nav.bidrag.domene.enums.samhandler.Kreditortype
