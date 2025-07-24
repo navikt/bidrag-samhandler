@@ -24,6 +24,7 @@ spec:
       rules:
        - application: logging
          namespace: nais-system
+       - application: bidrag-kodeverk
     inbound:
       rules:
       {{#each azure_access_inbound}}

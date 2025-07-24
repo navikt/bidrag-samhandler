@@ -1,0 +1,34 @@
+name: Deploy to all dev enviroments
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy_q4:
+    name: "Build and deploy to Q4"
+    permissions:
+      contents: "read"
+      id-token: "write"
+    uses: navikt/bidrag-workflow/.github/workflows/deploy.yaml@main
+    secrets: inherit
+    with:
+      nais_variabler_filnavn: q4.yaml
+
+  deploy_q2:
+    name: "Build and deploy to Q2"
+    permissions:
+      contents: "read"
+      id-token: "write"
+    uses: navikt/bidrag-workflow/.github/workflows/deploy.yaml@main
+    secrets: inherit
+    with:
+      nais_variabler_filnavn: q2.yaml
+
+  deploy_q1:
+    name: "Build and deploy to Q1"
+    permissions:
+      contents: "read"
+      id-token: "write"
+    uses: navikt/bidrag-workflow/.github/workflows/deploy.yaml@main
+    secrets: inherit
+    with:
+      nais_variabler_filnavn: q1.yaml
