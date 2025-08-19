@@ -13,8 +13,8 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.Version
 import no.nav.bidrag.domene.enums.diverse.Språk
 import no.nav.bidrag.domene.enums.samhandler.OffentligIdType
+import no.nav.bidrag.domene.enums.samhandler.Områdekode
 import no.nav.bidrag.domene.enums.samhandler.Valutakode
-import no.nav.bidrag.transport.samhandler.Områdekode
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.DynamicInsert
 import java.time.LocalDateTime
