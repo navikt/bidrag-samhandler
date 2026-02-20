@@ -11,10 +11,6 @@ KAFKA_GROUP_ID: bidrag-behandling
 KAFKA_BROKERS: localhost:9092
 KODEVERK_URL: https://bidrag-kodeverk.intern.dev.nav.no
 
-
-logging.level:
-  secureLogger: OFF
-
 spring:
   flyway:
     enabled: true

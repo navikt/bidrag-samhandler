@@ -1,6 +1,6 @@
 package no.nav.bidrag.samhandler.aop
 
-import no.nav.bidrag.commons.util.secureLogger
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.bidrag.transport.felles.ifTrue
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.slf4j.LoggerFactory
@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.client.HttpStatusCodeException
+
+private val LOGGER = KotlinLogging.logger { }
 
 @RestControllerAdvice
 class DefaultRestControllerAdvice {
@@ -26,12 +28,14 @@ class DefaultRestControllerAdvice {
         val payloadFeilmelding =
             exception.responseBodyAsString.isEmpty().ifTrue { exception.message }
                 ?: exception.responseBodyAsString
-        secureLogger.warn { "Det skjedde en feil: $payloadFeilmelding" }
+        LOGGER.warn { "Det skjedde en feil: $payloadFeilmelding" }
         return ResponseEntity
             .status(exception.statusCode)
             .header(HttpHeaders.WARNING, errorMessage)
-            .header(HttpHeaders.CONTENT_TYPE, if (hasBody) MediaType.APPLICATION_JSON_VALUE else MediaType.TEXT_PLAIN_VALUE)
-            .body(payloadFeilmelding)
+            .header(
+                HttpHeaders.CONTENT_TYPE,
+                if (hasBody) MediaType.APPLICATION_JSON_VALUE else MediaType.TEXT_PLAIN_VALUE,
+            ).body(payloadFeilmelding)
     }
 
     private fun getErrorMessage(exception: HttpStatusCodeException): String {

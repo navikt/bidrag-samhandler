@@ -14,7 +14,6 @@ spec:
         destinations:
           - id: loki
           - id: elastic
-          - id: secure_logs
   azure:
     application:
       enabled: true
@@ -32,8 +31,6 @@ spec:
            namespace: {{this.namespace}}
            cluster: {{this.cluster}}
       {{/each}}
-  secureLogs:
-    enabled: true
   image: {{ image }}
   kafka:
     pool: {{ kafka.pool }}

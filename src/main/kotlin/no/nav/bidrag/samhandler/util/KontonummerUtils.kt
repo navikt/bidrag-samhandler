@@ -25,8 +25,11 @@ object KontonummerUtils {
         val beregnetKontrollSiffer = 11 - (sum % 11)
 
         return when (beregnetKontrollSiffer) {
-            10 -> false // Ugyldig kontonummer
+            10 -> false
+
+            // Ugyldig kontonummer
             11 -> kontrollSiffer == 0
+
             else -> kontrollSiffer == beregnetKontrollSiffer
         }
     }

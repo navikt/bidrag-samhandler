@@ -1,11 +1,10 @@
 package no.nav.bidrag.samhandler.service
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.persistence.EntityManager
 import no.nav.bidrag.commons.security.utils.TokenUtils
-import no.nav.bidrag.commons.util.secureLogger
 import no.nav.bidrag.domene.ident.Ident
 import no.nav.bidrag.domene.land.Landkode3
-import no.nav.bidrag.samhandler.SECURE_LOGGER
 import no.nav.bidrag.samhandler.mapper.SamhandlerMapper
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerRepository
 import no.nav.bidrag.samhandler.persistence.repository.SamhandlerSøkSpec
@@ -37,9 +36,9 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.HttpClientErrorException
 import java.nio.charset.Charset
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.jvm.optionals.getOrNull
+
+private val LOGGER = KotlinLogging.logger { }
 
 @Service
 class SamhandlerService(
@@ -59,13 +58,11 @@ class SamhandlerService(
     }
 
     fun samhandlerSøk(samhandlerSøk: SamhandlerSøk): SamhandlersøkeresultatDto {
-        SECURE_LOGGER.info(
-            "Samhandlersøk utført av {}. Input: {}",
-            TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
-            samhandlerSøk,
-        )
+        LOGGER.info {
+            "${"Samhandlersøk utført av {}. Input: {}"} ${TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent"} $samhandlerSøk"
+        }
         val samhandlere = samhandlerRepository.findAll(SamhandlerSøkSpec.søkPåAlleParameter(samhandlerSøk))
-        SECURE_LOGGER.info("Samhandlersøk returnerte følgende samhandlere: {}", samhandlere.map { it.ident }.toString())
+        LOGGER.info { "${"Samhandlersøk returnerte følgende samhandlere: {}"} ${samhandlere.map { it.ident }}" }
         return SamhandlerMapper.mapTilSamhandlersøkeresultatDto(samhandlere)
     }
 
@@ -73,12 +70,15 @@ class SamhandlerService(
     fun opprettSamhandler(samhandlerDto: SamhandlerDto): Int {
         validerSamhandlerIkkeFinnesFraFør(samhandlerDto)
         val samhandler = SamhandlerMapper.mapTilSamhandler(samhandlerDto)
-        SECURE_LOGGER.info(
-            "OpprettSamhandler for {} utført av {} med følgende data: {}",
-            samhandlerDto.navn,
-            TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
-            samhandlerDto,
-        )
+        LOGGER.info {
+            "${"OpprettSamhandler for {} utført av {} med følgende data: {}"} ${
+                arrayOf<String?>(
+                    samhandlerDto.navn,
+                    TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
+                    samhandlerDto.toString(),
+                )
+            }"
+        }
         try {
             val opprettetSamhandler = samhandlerRepository.save(samhandler)
             entityManager.refresh(opprettetSamhandler)
@@ -193,12 +193,15 @@ class SamhandlerService(
         val lagretSamhandler = samhandlerRepository.save(oppdatertSamhandler)
         kafkaService.sendSamhandlerMelding(lagretSamhandler, SamhandlerKafkaHendelsestype.OPPDATERT)
 
-        SECURE_LOGGER.info(
-            "OppdaterSamhandler for {} utført av {} fra data: {}",
-            samhandlerDto.samhandlerId,
-            TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
-            samhandlerDto,
-        )
+        LOGGER.info {
+            "${"OppdaterSamhandler for {} utført av {} fra data: {}"} ${
+                arrayOf(
+                    samhandlerDto.samhandlerId,
+                    TokenUtils.hentSaksbehandlerIdent() ?: TokenUtils.hentApplikasjonsnavn() ?: "ukjent",
+                    samhandlerDto.toString(),
+                )
+            }"
+        }
 
         return ResponseEntity.ok(SamhandlerMapper.mapTilSamhandlerDto(oppdatertSamhandler))
     }
@@ -353,7 +356,7 @@ class SamhandlerService(
                 val samhandler = samhandlerRepository.findByIdentInNewTransaction(samhandlerId.verdi)
 
                 if (samhandler != null) {
-                    secureLogger.error {
+                    LOGGER.error(e) {
                         "Feil ved lagring av samhandler. Det finnes allerede et samhandler med samhandlerId ${request.samhandlerId}. Request: $request"
                     }
                     throw ConflictException(
@@ -372,7 +375,7 @@ class SamhandlerService(
                 }
             }
         }
-        secureLogger.error(e) { "Uventet feil ved lagring av samhandler: ${e.message}" }
+        LOGGER.error(e) { "Uventet feil ved lagring av samhandler: ${e.message}" }
         throw e
     }
 }
