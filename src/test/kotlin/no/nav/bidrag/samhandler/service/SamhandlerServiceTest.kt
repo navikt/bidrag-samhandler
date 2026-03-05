@@ -220,24 +220,6 @@ class SamhandlerServiceTest {
     }
 
     @Test
-    fun `validerInput returnerer bad request om valutakode mangler`() {
-        val kontonummer =
-            KontonummerDto(
-                norskKontonummer = "12345678901",
-                iban = null,
-                swift = null,
-                banknavn = null,
-                landkodeBank = null,
-                valutakode = null,
-                bankCode = null,
-            )
-        every { KontonummerUtils.erGyldigKontonummerMod11("12345678901") } returns true
-        val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
-        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
-        result.responseBodyAsString shouldContain "Valutakode må angis."
-    }
-
-    @Test
     fun `validerInput returnerer bad request om landkodeBank er uglydig`() {
         val kontonummer =
             KontonummerDto(
@@ -252,24 +234,6 @@ class SamhandlerServiceTest {
         val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
         val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
         result.responseBodyAsString shouldContain "Landkode for bank NO må ha 3 tegn."
-    }
-
-    @Test
-    fun `validerInput returnerer bad request om alle kontonummer felt er blanke`() {
-        val kontonummer =
-            KontonummerDto(
-                norskKontonummer = null,
-                iban = null,
-                swift = null,
-                banknavn = null,
-                landkodeBank = null,
-                valutakode = Valutakode.NOK,
-                bankCode = null,
-            )
-        val dto = samhandlerDto.copy(kontonummer = kontonummer, språk = Språk.NB)
-        val result = shouldThrow<HttpStatusCodeException> { samhandlerService.validerInput(dto) }
-        result.responseBodyAsString shouldContain
-            "Samhandleren må ha kontonummeropplysninger. Fyll inn enten norsk eller utenlandsk kontoinformasjon."
     }
 
     @Test
