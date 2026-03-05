@@ -268,29 +268,10 @@ class SamhandlerService(
                 )
             }
         }
-        if (kontonummer.valutakode == null) {
-            valideringsfeil.leggTil(
-                getPath(SamhandlerDto::kontonummer, KontonummerDto::valutakode),
-                "Valutakode må angis.",
-            )
-        }
         if (kontonummer.landkodeBank != null && kontonummer.landkodeBank?.gyldig() == false) {
             valideringsfeil.leggTil(
                 getPath(SamhandlerDto::kontonummer, KontonummerDto::landkodeBank),
                 "Landkode for bank ${kontonummer.landkodeBank?.verdi} må ha 3 tegn.",
-            )
-        }
-        if (kontonummer.norskKontonummer.isNullOrBlank() &&
-            kontonummer.iban.isNullOrBlank() &&
-            kontonummer.swift.isNullOrBlank()
-        ) {
-            valideringsfeil.leggTil(
-                getPath(SamhandlerDto::kontonummer, KontonummerDto::norskKontonummer),
-                "Samhandleren må ha kontonummeropplysninger. Fyll inn enten norsk eller utenlandsk kontoinformasjon.",
-            )
-            valideringsfeil.leggTil(
-                getPath(SamhandlerDto::kontonummer, KontonummerDto::iban),
-                "Samhandleren må ha kontonummeropplysninger. Fyll inn enten norsk eller utenlandsk kontoinformasjon.",
             )
         }
     }
