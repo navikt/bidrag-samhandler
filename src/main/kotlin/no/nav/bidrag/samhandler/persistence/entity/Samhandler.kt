@@ -32,10 +32,10 @@ data class Samhandler(
     @Column(name = "navn")
     val navn: String = "",
     @Column(name = "offentlig_id")
-    val offentligId: String = "",
+    val offentligId: String? = null,
     @Column(name = "offentlig_id_type")
     @Enumerated(EnumType.STRING)
-    val offentligIdType: OffentligIdType = OffentligIdType.FNR,
+    val offentligIdType: OffentligIdType? = null,
     @Column(name = "sprak")
     @Enumerated(EnumType.STRING)
     val språk: Språk? = null,
