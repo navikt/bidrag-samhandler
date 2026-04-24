@@ -3,27 +3,32 @@ package no.nav.bidrag.samhandler
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.nimbusds.jose.JOSEObjectType
 import no.nav.bidrag.commons.web.test.HttpHeaderTestRestTemplate
+import no.nav.bidrag.samhandler.config.SamhandlerTestConfig
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.AfterEach
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.resttestclient.TestRestTemplate
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.context.ApplicationContext
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.util.UriComponentsBuilder
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
+import org.wiremock.spring.EnableWireMock
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = [BidragSamhandlerLocal::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWireMock
 @EnableMockOAuth2Server
+@EnableWireMock
+@AutoConfigureTestRestTemplate
+@Import(SamhandlerTestConfig::class)
 class SpringTestRunner {
     @LocalServerPort
     protected var port: Int = 0
@@ -51,7 +56,7 @@ class SpringTestRunner {
 
     fun rootUri(): String = LOCALHOST + port
 
-    fun rootUriComponentsBuilder(): UriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(rootUri())
+    fun rootUriComponentsBuilder(): UriComponentsBuilder = UriComponentsBuilder.fromUriString(rootUri())
 
     protected fun getPort(): String = port.toString()
 

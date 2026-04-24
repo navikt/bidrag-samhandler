@@ -5,5 +5,5 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class KafkaConfig(
-    @Value("\${TOPIC_SAMHANDLER}") val topicSamhandler: String,
+    @param:Value($$"${TOPIC_SAMHANDLER}") val topicSamhandler: String,
 )

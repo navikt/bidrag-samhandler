@@ -10,8 +10,12 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 
 @EmbeddedKafka(
     partitions = 1,
-    brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"],
-    topics = ["\${TOPIC_SAMHANDLER}"],
+    brokerProperties = [
+        "listeners=EXTERNAL://localhost:0,CONTROLLER://localhost:0",
+        "listener.security.protocol.map=EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT",
+        "controller.listener.names=CONTROLLER",
+        "inter.broker.listener.name=EXTERNAL",
+    ],
 )
 class SamhandlerControllerIntegrationTest : SpringTestRunner() {
     fun urlForPost() = rootUriComponentsBuilder().pathSegment("samhandler").build().toUri()
