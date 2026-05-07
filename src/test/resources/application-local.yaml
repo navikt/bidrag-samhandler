@@ -10,6 +10,9 @@ KAFKA_BOOTSTRAP_SERVERS: localhost:9092
 KAFKA_GROUP_ID: bidrag-behandling
 KAFKA_BROKERS: localhost:9092
 KODEVERK_URL: https://bidrag-kodeverk.intern.dev.nav.no
+KAFKA_KEYSTORE_PATH: ""
+KAFKA_TRUSTSTORE_PATH: ""
+KAFKA_CREDSTORE_PASSWORD: ""
 
 spring:
   flyway:
