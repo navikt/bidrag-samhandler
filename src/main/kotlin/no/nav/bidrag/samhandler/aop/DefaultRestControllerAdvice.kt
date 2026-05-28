@@ -16,7 +16,6 @@ private val LOGGER = KotlinLogging.logger { }
 
 @RestControllerAdvice
 class DefaultRestControllerAdvice {
-
     @ResponseBody
     @ExceptionHandler(HttpStatusCodeException::class)
     fun handleHttpClientErrorException(exception: HttpStatusCodeException): ResponseEntity<*> {

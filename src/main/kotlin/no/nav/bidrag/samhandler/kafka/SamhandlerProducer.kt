@@ -15,7 +15,6 @@ class SamhandlerProducer(
     private val kafkaConfig: KafkaConfig,
     private val objectMapper: ObjectMapper,
 ) {
-
     @Retryable(
         value = [Exception::class],
         maxAttempts = 10,
@@ -35,7 +34,7 @@ class SamhandlerProducer(
             .thenAccept {
                 secureLogger.info {
                     "Melding på topic $topic for samhandlerId ${samhandlerhendelse.samhandlerId} er sendt. " +
-                            "Fikk offset ${it?.recordMetadata?.offset()}"
+                        "Fikk offset ${it?.recordMetadata?.offset()}"
                 }
             }.exceptionally {
                 val feilmelding =
