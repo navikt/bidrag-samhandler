@@ -18,6 +18,7 @@
       </jsonGeneratorDecorator>
     </encoder>
   </appender>
+
   <springProfile name="nais">
     <appender name="team-logs" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
       <destination>team-logs.nais-system:5170</destination>
@@ -42,6 +43,12 @@
     <appender-ref ref="stdout_json"/>
     <appender-ref ref="team-logs" />
   </root>
+
+  <logger name="org.hibernate.orm.connections.pooling" level="warn"/>
+
+  <logger name="secureLogger" level="INFO" additivity="false" >
+    <appender-ref ref="team-logs" />
+  </logger>
 
   <logger name="org.hibernate.orm.connections.pooling" level="warn"/>
 

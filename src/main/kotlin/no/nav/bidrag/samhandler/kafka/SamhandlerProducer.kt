@@ -1,9 +1,9 @@
 package no.nav.bidrag.samhandler.kafka
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.bidrag.commons.util.secureLogger
 import no.nav.bidrag.samhandler.config.KafkaConfig
 import no.nav.bidrag.transport.samhandler.Samhandlerhendelse
-import org.slf4j.LoggerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
@@ -15,8 +15,6 @@ class SamhandlerProducer(
     private val kafkaConfig: KafkaConfig,
     private val objectMapper: ObjectMapper,
 ) {
-    private val logger = LoggerFactory.getLogger(this::class.java)
-
     @Retryable(
         value = [Exception::class],
         maxAttempts = 10,
@@ -34,15 +32,15 @@ class SamhandlerProducer(
         kafkaTemplate
             .send(topic, samhandlerhendelse.samhandlerId, melding)
             .thenAccept {
-                logger.info(
+                secureLogger.info {
                     "Melding på topic $topic for samhandlerId ${samhandlerhendelse.samhandlerId} er sendt. " +
-                        "Fikk offset ${it?.recordMetadata?.offset()}",
-                )
+                        "Fikk offset ${it?.recordMetadata?.offset()}"
+                }
             }.exceptionally {
                 val feilmelding =
                     "Melding på topic $topic kan ikke sendes for samhandlerId ${samhandlerhendelse.samhandlerId}. " +
                         "Feiler med ${it.message}"
-                logger.warn(feilmelding)
+                secureLogger.warn { feilmelding }
                 error(feilmelding)
             }
     }

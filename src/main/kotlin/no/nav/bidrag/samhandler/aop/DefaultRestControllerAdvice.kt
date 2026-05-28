@@ -3,7 +3,6 @@ package no.nav.bidrag.samhandler.aop
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.bidrag.transport.felles.ifTrue
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -17,13 +16,11 @@ private val LOGGER = KotlinLogging.logger { }
 
 @RestControllerAdvice
 class DefaultRestControllerAdvice {
-    private val logger = LoggerFactory.getLogger(this::class.java)
-
     @ResponseBody
     @ExceptionHandler(HttpStatusCodeException::class)
     fun handleHttpClientErrorException(exception: HttpStatusCodeException): ResponseEntity<*> {
         val errorMessage = getErrorMessage(exception)
-        logger.warn(errorMessage, exception)
+        LOGGER.warn(exception) { errorMessage }
         val hasBody = exception.responseBodyAsString.isNotEmpty()
         val payloadFeilmelding =
             exception.responseBodyAsString.isEmpty().ifTrue { exception.message }
@@ -53,7 +50,7 @@ class DefaultRestControllerAdvice {
     @ResponseBody
     @ExceptionHandler(Exception::class)
     fun handleOtherExceptions(exception: Exception): ResponseEntity<*> {
-        logger.warn("Det skjedde en ukjent feil", exception)
+        LOGGER.warn(exception) { "Det skjedde en ukjent feil" }
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .header(HttpHeaders.WARNING, "Det skjedde en ukjent feil: ${exception.message}")
@@ -63,7 +60,7 @@ class DefaultRestControllerAdvice {
     @ResponseBody
     @ExceptionHandler(JwtTokenUnauthorizedException::class)
     fun handleUnauthorizedException(exception: JwtTokenUnauthorizedException): ResponseEntity<*> {
-        logger.warn("Ugyldig eller manglende sikkerhetstoken", exception)
+        LOGGER.warn(exception) { "Ugyldig eller manglende sikkerhetstoken" }
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
             .header(HttpHeaders.WARNING, "Ugyldig eller manglende sikkerhetstoken")
