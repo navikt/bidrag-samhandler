@@ -41,3 +41,6 @@ azure_access_inbound:
   - application: bidrag-behandling
     namespace: bidrag
     cluster: prod-gcp
+  - application: bidrag-frontend
+    namespace: bidrag
+    cluster: prod-gcp
