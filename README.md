@@ -1,4 +1,11 @@
 # Bidrag-samhandler
+
+## ⚠️ DETTE REPOET ER FLYTTET
+
+> **Dette repoet er flyttet til [navikt/bidrag-backend](https://github.com/navikt/bidrag-backend).**
+> Bruk det nye repoet for videre utvikling — dette repoet oppdateres ikke lenger.
+
+
 Mikrotjeneste for oppslag på samhandler for Bidrag
 
 [![continuous integration](https://github.com/navikt/bidrag-samhandler/actions/workflows/pr.yaml/badge.svg)](https://github.com/navikt/bidrag-dialog/actions/workflows/ci.yaml)
